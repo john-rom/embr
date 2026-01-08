@@ -1,0 +1,30 @@
+#include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/sys/reboot.h>
+
+#include "embr_app.h"
+
+LOG_MODULE_REGISTER(app);
+
+int main(void) {
+
+  embr_err_t err = embr_app_init();
+  if (err) {
+    LOG_ERR("Ember init failed: %d", err);
+    goto fatal;
+  }
+  LOG_INF("Ember init success");
+
+  err = embr_app_start();
+  if (err) {
+    LOG_ERR("Ember start failed: %d", err);
+    goto fatal;
+  }
+  LOG_INF("Ember start success");
+
+  k_sleep(K_FOREVER);
+
+fatal:
+  k_sleep(K_MSEC(200));
+  sys_reboot(SYS_REBOOT_COLD);
+}
