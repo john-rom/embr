@@ -1,0 +1,20 @@
+name: Unit Tests
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run unit tests in nrf_2.4.0 Docker container
+        run: |
+          docker run --rm \
+          -v "$GITHUB_WORKSPACE:/workspace" \
+          -w /workspace \
+          nrf_2.4.0:2.4.0 \
+          bash -c "source /ncs/zephyr/zephyr-env.sh \
+            && west twister -T tests/unit \
+            && rm -rf twister-out"
