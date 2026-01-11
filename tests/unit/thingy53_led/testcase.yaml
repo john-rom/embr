@@ -1,0 +1,5 @@
+tests:
+  unit.thingy53_led:
+    tags: thingy53
+    type: unit
+    platform_allow: unit_testing

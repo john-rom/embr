@@ -7,8 +7,9 @@
 LOG_MODULE_REGISTER(app);
 
 int main(void) {
+  embr_err_t err = 0;
 
-  embr_err_t err = embr_app_init();
+  err = embr_app_init();
   if (err) {
     LOG_ERR("Ember init failed: %d", err);
     goto fatal;
@@ -25,6 +26,7 @@ int main(void) {
   k_sleep(K_FOREVER);
 
 fatal:
+  // Brief delay to complete logging
   k_sleep(K_MSEC(200));
   sys_reboot(SYS_REBOOT_COLD);
 }

@@ -6,4 +6,5 @@ zephyr_library_include_directories(
 
 zephyr_library_sources(
   src/embr_app.c
+  src/embr_error_id.c
 )
