@@ -12,11 +12,15 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Run unit tests in nrf_2.4.0 Docker container
-        run: |
+      - run: |
           docker run --rm \
+          --user "$(id -u):$(id -g)" \
           -v "$GITHUB_WORKSPACE:/workspace" \
           -w /workspace \
           nrf_2.4.0:2.4.0 \
-          bash -c "source /ncs/zephyr/zephyr-env.sh \
-            && west twister -T tests/unit \
-            && rm -rf twister-out"
+          bash -lc '
+            set -euo pipefail
+            trap "rm -rf twister-out" EXIT
+            source /ncs/zephyr/zephyr-env.sh
+            west twister -T tests/unit
+          '
