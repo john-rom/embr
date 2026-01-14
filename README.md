@@ -149,7 +149,7 @@ west twister -T tests/unit
 ### Test & CI
 - **Twister**: Zephyr's test runner for unit/integration tests
 - **Ztest**: Zephyr’s unit test framework
-- **GitHub Actions**: CI for builds/tests on PRs
+- **GitHub Actions**: CI for builds/tests on pushes and pull requests
 - **Docker**: pinned, reproducible toolchain environment (NCS/Zephyr)
 
 ## Model Artifacts
