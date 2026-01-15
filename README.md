@@ -53,6 +53,13 @@ platform seams, and unit tests; additional modules and the end-to-end voice pipe
   - voice command → Matter/Thread smart bulb control (wireless)
 
 ## Power Profile
+<p align="center">
+<figure>
+  <img src="docs/assets/power/t53_ppk2.png" width="600" alt="Thingy:53 connected to the PPK2)">
+  <figcaption><em>Thingy:53 connected to the PPK2 via the current measurement and debug board.</em></figcaption>
+</figure>
+</p>
+<p></p>
 Baseline power measurements were captured on a Nordic Thingy:53 using the Nordic Power Profiler Kit II (PPK2), which powered the device under test.
 
 | Profile | Avg Current | Peak Current | Notes |
