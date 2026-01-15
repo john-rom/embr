@@ -60,7 +60,7 @@ Baseline power measurements were captured on a Nordic Thingy:53 using the Nordic
 | LED Blink Baseline | 10.46 µA | 13.60 mA | Mean of 3 trials (steady-state after init settles) |
 
 <figure>
-  <img src="docs/assets/ppk_blinky_steady_1.png" width="1200" alt="PPK2 steady-state blinky capture (Trial 1)">
+  <img src="docs/assets/power/ppk_blinky_steady_1.png" width="1200" alt="PPK2 steady-state blinky capture (Trial 1)">
   <figcaption><em>PPK2 capture showing steady-state LED blink current after init settles (selection window).</em></figcaption>
 </figure>
 <p></p>Full measurement notes and screenshots: [docs/power.md](docs/power.md)
