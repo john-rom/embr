@@ -52,6 +52,19 @@ platform seams, and unit tests; additional modules and the end-to-end voice pipe
 - End-to-end system demo:
   - voice command → Matter/Thread smart bulb control (wireless)
 
+## Power Profile
+Baseline power measurements were captured on a Nordic Thingy:53 using the Nordic Power Profiler Kit II (PPK2), which powered the device under test.
+
+| Profile | Avg Current | Peak Current | Notes |
+|---|---:|---:|---|
+| LED Blink Baseline | 10.46 µA | 13.60 mA | Mean of 3 trials (steady-state after init settles) |
+
+<figure>
+  <img src="docs/assets/ppk_blinky_steady_1.png" width="1200" alt="PPK2 steady-state blinky capture (Trial 1)">
+  <figcaption><em>PPK2 capture showing steady-state LED blink current after init settles (selection window).</em></figcaption>
+</figure>
+<p></p>Full measurement notes and screenshots: [docs/power.md](docs/power.md)
+
 ## Repository layout
 - `.github/workflows/` → CI workflows
 - `app/` → application logic and features
