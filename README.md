@@ -119,7 +119,7 @@ Baseline power measurements were captured on a Nordic Thingy:53 using the Nordic
 Full measurement notes and screenshots: [docs/power.md](docs/power.md)
 
 ## Software Stack
-- **Languages**: C/C++
+- **Language**: C
 - **Firmware base**: Zephyr RTOS (via nRF Connect SDK v2.4.0)
 - **Voice pipeline (in progress)**: DMIC/PDM audio capture → buffering/feature extraction → command mapping
 - **On-device inference (planned)**: Edge Impulse runtime integration (keyword model) behind a thin wrapper layer (CI-stubbable)
@@ -165,7 +165,7 @@ Full measurement notes and screenshots: [docs/power.md](docs/power.md)
 ### Matter (Connectivity Standards Alliance)
 - **chip-tool**: CLI Matter controller for commissioning/testing devices
 - **ZAP (ZCL Advanced Platform)**: generates Matter cluster/attribute code from data model
-  - Used when implementing **harth**, but included here as a system component
+  - Used when implementing **harth**, but included here as a system development tool
 
 ### Thread
 - **OpenThread Border Router (Docker)**: local Thread network + commissioning environment
