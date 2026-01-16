@@ -8,7 +8,7 @@ Values are intended to provide a repeatable baseline and enable apples-to-apples
 ## Measurement Setup
 
 <figure>
-  <img src="docs/assets/power/t53_ppk2.png" width="600" alt="Thingy:53 connected to the PPK2)">
+  <img src="assets/power/t53_ppk2.png" width="600" alt="Thingy:53 connected to the PPK2)">
   <figcaption><em>Thingy:53 connected to the PPK2 via the current measurement and debug board.</em></figcaption>
 </figure>
 </p>
@@ -42,7 +42,7 @@ Values are intended to provide a repeatable baseline and enable apples-to-apples
 - Average peak current (blink event): 13.60 mA
 
 **Representative steady-state capture**
-![PPK2 blinky steady-state](docs/assets/power/ppk_blinky_steady_1.png)
+![PPK2 blinky steady-state](assets/power/ppk_blinky_steady_1.png)
 
 ---
 
@@ -55,7 +55,7 @@ Boot current is recorded separately as a transient event.
 - Observations: Generally stable across boots, logging enabled
 
 **Representative boot capture**
-![PPK2 boot transient](docs/assets/power/ppk_blinky_boot_1.png)
+![PPK2 boot transient](assets/power/ppk_blinky_boot_1.png)
 
 ---
 
