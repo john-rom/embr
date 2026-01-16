@@ -13,12 +13,12 @@ Values are intended to provide a repeatable baseline and enable apples-to-apples
 </figure>
 </p>
 
-**Tool:** Nordic Power Profiler Kit II (PPK2)  
-**Measurement mode:** Ammeter mode (target powered through PPK2)  
+**Tool**: Nordic Power Profiler Kit II (PPK2)  
+**Measurement mode**: Ammeter mode (target powered through PPK2)  
 **Supply voltage**: 3.12 V (measured at Thingy:53 VIN with DMM; PPK2 VOUT → VIN)  
-**Target hardware:** Nordic Thingy:53  
-**Firmware state:** Blinky baseline (tag v0.1.0)  
-**Logging:** RTT
+**Target hardware**: Nordic Thingy:53  
+**Firmware state**: Blinky baseline (tag v0.1.0)  
+**Logging**: RTT
 
 **Notes**
 - Capture windows are taken after initialization settles unless stated otherwise.
