@@ -1,13 +1,13 @@
 # embr
 ## Edge AI Voice Control for Thread Smart Lighting
 
+[![Unit Tests](https://github.com/john-rom/ember/actions/workflows/run-unit-tests.yaml/badge.svg)](https://github.com/john-rom/ember/actions/workflows/run-unit-tests.yaml)
+[![License: View Only](https://img.shields.io/badge/License-Review%20Only-lightgrey)](LICENSE)
+
 <p align="center">
   <img src="docs/assets/embr_logo_light.png#gh-light-mode-only" alt="embr logo" width="280" />
   <img src="docs/assets/embr_logo_dark.png#gh-dark-mode-only" alt="embr logo" width="280" />
 </p>
-
-[![Unit Tests](https://github.com/john-rom/ember/actions/workflows/run-unit-tests.yaml/badge.svg)](https://github.com/john-rom/ember/actions/workflows/run-unit-tests.yaml)
-
 
 **embr** is a wireless, embedded voice-control system built to make lighting respond quickly and naturally. It wakes on command, 
 processes your voice locally, and triggers lighting changes in milliseconds, all designed around low power, real-time technology.
@@ -17,15 +17,6 @@ And **embr** is just one part of a broader Edge AI platform aimed at enabling pr
 
 **embr** integrates with **harth**, a bespoke Matter bridge currently in active development. Over time, **harth** is intended to 
 connect with an entire set of drop-in AI modules to support autonomous, intelligent, and safe control of your favorite spaces.
-
-## Motivation
-Voice control for lighting should feel intuitive, instant, and dependable. Relying on cloud services, Wi-Fi stability, or a vendor mobile 
-app adds latency, fragility, and inconvenience to something that should “just work.” **embr** is a local-first embedded project exploring 
-on-device keyword detection paired with Thread-native control paths. An Edge AI-powered core and a clean boundary to Matter-enabled 
-devices allows for fast, private control that remains interoperable as the system expands.
-
-This repository is an incremental migration from a working prototype into a clean, testable codebase. The current public baseline focuses on bring-up, 
-platform seams, and unit tests; additional modules and the end-to-end voice pipeline will land here as they are refactored and integrated.
 
 ## Status + Roadmap
 ### Implemented
@@ -52,25 +43,14 @@ platform seams, and unit tests; additional modules and the end-to-end voice pipe
 - End-to-end system demo:
   - voice command → Matter/Thread smart bulb control (wireless)
 
-## Power Profile
-<p align="center">
-<figure>
-  <img src="docs/assets/power/t53_ppk2.png" width="600" alt="Thingy:53 connected to the PPK2)">
-  <figcaption><em>Thingy:53 connected to the PPK2 via the current measurement and debug board.</em></figcaption>
-</figure>
-</p>
-<p></p>
-Baseline power measurements were captured on a Nordic Thingy:53 using the Nordic Power Profiler Kit II (PPK2), which powered the device under test.
+## Motivation
+Voice control for lighting should feel intuitive, instant, and dependable. Relying on cloud services, Wi-Fi stability, or a vendor mobile 
+app adds latency, fragility, and inconvenience to something that should "just work". **embr** is a local-first embedded project exploring 
+on-device keyword detection paired with Thread-native control paths. An Edge AI-powered core and a clean boundary to Matter-enabled 
+devices allows for fast, private control that remains interoperable as the system expands.
 
-| Profile | Avg Current | Peak Current | Notes |
-|---|---:|---:|---|
-| LED Blink Baseline | 10.46 µA | 13.60 mA | Mean of 3 trials (steady-state after init settles) |
-
-<figure>
-  <img src="docs/assets/power/ppk_blinky_steady_1.png" width="1200" alt="PPK2 steady-state blinky capture (Trial 1)">
-  <figcaption><em>PPK2 capture showing steady-state LED blink current after init settles (selection window).</em></figcaption>
-</figure>
-<p></p>Full measurement notes and screenshots: [docs/power.md](docs/power.md)
+This repository is an incremental migration from a working prototype into a clean, testable codebase. The current public baseline focuses on bring-up, 
+platform seams, and unit tests; additional modules and the end-to-end voice pipeline will land here as they are refactored and integrated.
 
 ## Repository layout
 - `.github/workflows/` → CI workflows
@@ -81,7 +61,7 @@ Baseline power measurements were captured on a Nordic Thingy:53 using the Nordic
 - `tests/unit/` → unit tests executed via Zephyr's Twister
 - `CMakeLists.txt` → CMake build configuration
 - `Doxyfile` → Doxygen documentation configuration
-- `prj.conf` → application configuration
+- `prj.conf` → Kconfig application configuration
 
 ## Building/Flashing
 ### Requirements
@@ -99,7 +79,7 @@ west build -p -b thingy53_nrf5340_cpuapp
 This will do a pristine build for the Thingy:53 target board (assuming a secure deployment environment).
 
 ### Flash
-Connect the Thingy:53 to the Nordic DK’s J-Link DEBUG OUT header using a 10-pin 1.27 mm ARM Cortex-M SWD ribbon cable.
+Connect the Thingy:53 to the Nordic DK's J-Link DEBUG OUT header using a 10-pin, 2x5 1.27 mm IDC (SWD) ribbon cable.
 
 From the project root directory:
 ```text
@@ -115,8 +95,31 @@ From the project root directory:
 west twister -T tests/unit
 ```
 
+## Power Profile
+<p align="center">
+<figure>
+  <img src="docs/assets/power/t53_ppk2.png" width="600" alt="Thingy:53 connected to the PPK2)">
+  <figcaption><em>Thingy:53 connected to the PPK2 via the current measurement and debug board.</em></figcaption>
+</figure>
+</p>
+<p></p>
+Baseline power measurements were captured on a Nordic Thingy:53 using the Nordic Power Profiler Kit II (PPK2), which powered the device under test.
+<p></p>
+
+| Profile | Avg Current | Peak Current | Notes |
+|---|---:|---:|---|
+| LED Blink Baseline | 10.46 µA | 13.60 mA | Mean of 3 trials (steady-state after init settles) |
+
+<figure>
+  <img src="docs/assets/power/ppk_blinky_steady_1.png" width="1200" alt="PPK2 steady-state blinky capture (Trial 1)">
+  <figcaption><em>PPK2 capture showing steady-state LED blink current after init settles (selection window).</em></figcaption>
+</figure>
+<p></p>
+
+Full measurement notes and screenshots: [docs/power.md](docs/power.md)
+
 ## Software Stack
-- **Language**: C/C++
+- **Languages**: C/C++
 - **Firmware base**: Zephyr RTOS (via nRF Connect SDK v2.4.0)
 - **Voice pipeline (in progress)**: DMIC/PDM audio capture → buffering/feature extraction → command mapping
 - **On-device inference (planned)**: Edge Impulse runtime integration (keyword model) behind a thin wrapper layer (CI-stubbable)
@@ -138,7 +141,7 @@ west twister -T tests/unit
   - **Power Profiler Kit II (PPK2)**:
     - used to measure, quantify, and visualize power consumption during development and application runtime:
     - 200nA to 1A measurement range
-  
+
 ### Nanoleaf:
   - Essentials A19/E26 Matter/Thread Smart Bulb
 
@@ -148,7 +151,7 @@ west twister -T tests/unit
 
 ## Tooling
 ### Build & configuration
-- **west**: Zephyr/NCS workspace + build/flash wrapper
+- **west**: Zephyr/NCS workspace management + build/flash/debug wrapper
 - **CMake + Ninja**: build system + fast backend generator
 - **Kconfig**: feature and compile-time configuration menus/options
 - **Devicetree (DTS)**: hardware description (pins, buses, peripherals)
@@ -157,20 +160,21 @@ west twister -T tests/unit
 - **SEGGER J-Link**: SWD debug probe used by Nordic DKs
 - **RTT (Real-Time Transfer)**: low-overhead debug logging over J-Link
 - **nrfjprog / nrfutil**: Nordic flashing, provisioning, and DFU utilities (as needed)
-- **west flash / debug** — standard Zephyr commands for flashing + debugging
+- **GDB**: via `west debug` command
 
 ### Matter (Connectivity Standards Alliance)
 - **chip-tool**: CLI Matter controller for commissioning/testing devices
-- **ZAP (ZCL Advanced Platform)**: generates Matter cluster/attribute code from data models
+- **ZAP (ZCL Advanced Platform)**: generates Matter cluster/attribute code from data model
+  - Used when implementing **harth**, but included here as a system component
 
 ### Thread
 - **OpenThread Border Router (Docker)**: local Thread network + commissioning environment
 
 ### Test & CI
 - **Twister**: Zephyr's test runner for unit/integration tests
-- **Ztest**: Zephyr’s unit test framework
+- **Ztest**: Zephyr's unit test framework
 - **GitHub Actions**: CI for builds/tests on pushes and pull requests
-- **Docker**: pinned, reproducible toolchain environment (NCS/Zephyr)
+- **Docker**: pinned, reproducible toolchain environment (NCS v2.4.0 + Zephyr)
 
 ## Model Artifacts
 This repository will not include model artifacts, as the intent is simply to keep the public repo buildable for review, platform work, 
