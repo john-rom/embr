@@ -19,29 +19,32 @@ And **embr** is just one part of a broader Edge AI platform aimed at enabling pr
 connect with an entire set of drop-in AI modules to support autonomous, intelligent, and safe control of your favorite spaces.
 
 ## Status + Roadmap
-### Implemented
-- Essential board and Zephyr RTOS bring-up, with logging over SEGGER RTT
-- Early hardware bring-up: functional GPIO wrapper and LED modules
-- Minimal application lifecycle API, running blinky on-device
-- Unit testing infrastructure: Zephyr's Twister runs unit tests with mocks using the Ztest framework
-- Continuous Integration: GitHub Actions workflow up and running via self-hosted runner, unit tests green
-- Basic Doxygen documentation
+  ### Implemented
+  - Essential board and Zephyr RTOS bring-up, with logging over SEGGER RTT
+  - Early hardware bring-up: functional GPIO wrapper and LED modules
+  - Mic module scaffolding: VM3011 digital MEMS mic integration (driver + DTS)
+  - Minimal application lifecycle API, running blinky on-device
+  - Unit testing infrastructure: Zephyr's Twister runs unit tests with mocks using the Ztest framework
+  - Continuous Integration: GitHub Actions workflow up and running via self-hosted runner
+  - Basic Doxygen documentation
+  - Baseline and ongoing power profiling with Nordic PPK2
 
-### Next
-- Baseline and ongoing power profiling with PPK2
-- DMIC bring-up and abstraction; validation of wake-on-sound capability
+  ### Next
+  - DMIC bring-up and validation
+  - Validation of mic wake-on-sound capability
+  - Mic module unit tests
 
-### Planned
-- Edge Impulse wrapper with local model integration + stubbing for CI
-- Application-level modules: inference + command mapping
-- Minimal inference pipeline evaluation:
-  - voice command → DMIC → EI inference → lighting command → on-board LED
-- Track resource metrics, telemetry, and performance benchmarking
-- Thread networking integration with CoAP client messaging
-- Companion translator node (separate device/firmware; developed concurrently):
-  - CoAP server endpoint → Matter cluster commands
-- End-to-end system demo:
-  - voice command → Matter/Thread smart bulb control (wireless)
+  ### Planned
+  - Edge Impulse wrapper with local model integration + stubbing for CI
+  - Application-level modules: inference + command mapping
+  - Minimal inference pipeline evaluation:
+      - voice command → DMIC → EI inference → lighting command → on-board LED
+  - Track resource metrics, telemetry, and performance benchmarking
+  - Thread networking integration with CoAP client messaging
+  - Companion translator node (separate device/firmware; developed concurrently):
+      - CoAP server endpoint → Matter cluster commands
+  - End-to-end system demo:
+      - voice command → Matter/Thread smart bulb control (wireless)
 
 ## Motivation
 Voice control for lighting should feel intuitive, instant, and dependable. Relying on cloud services, Wi-Fi stability, or a vendor mobile 
@@ -55,10 +58,12 @@ platform seams, and unit tests; additional modules and the end-to-end voice pipe
 ## Repository layout
 - `.github/workflows/` → CI workflows
 - `app/` → application logic and features
+- `boards/` → board-specific overlays and build configuration
 - `docs/` → documentation and README assets (images, diagrams)
 - `platform/` → platform abstractions (drivers, wrappers, portability seams)
 - `src/` → application entry points / glue code
 - `tests/unit/` → unit tests executed via Zephyr's Twister
+- `third_party/` → external dependencies and vendor libraries
 - `CMakeLists.txt` → CMake build configuration
 - `Doxyfile` → Doxygen documentation configuration
 - `prj.conf` → Kconfig application configuration
