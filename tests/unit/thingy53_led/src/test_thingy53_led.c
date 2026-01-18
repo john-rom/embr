@@ -11,7 +11,7 @@ static void thingy53_led_before(void *fixture) {
 
 ZTEST_SUITE(thingy53_led, NULL, NULL, thingy53_led_before, NULL, NULL);
 
-ZTEST(thingy53_led, test_init_calls_impl_success) {
+ZTEST(thingy53_led, test_init_returns_zero_on_success) {
   init_return_value = 0;
 
   int ret = thingy53_led_init();
@@ -19,7 +19,7 @@ ZTEST(thingy53_led, test_init_calls_impl_success) {
   zassert_equal(init_call_count, 1, "init should be called once");
 }
 
-ZTEST(thingy53_led, test_init_propagates_impl_error_fail) {
+ZTEST(thingy53_led, test_init_returns_error_on_fail) {
   init_return_value = -EIO;
 
   int ret = thingy53_led_init();
@@ -33,7 +33,7 @@ ZTEST(thingy53_led, test_toggle_calls_impl_with_color_success) {
   zassert_equal(ret, 0, "thingy53_led_toggle should return 0");
   zassert_equal(toggle_call_count, 1, "toggle should be called once");
   zassert_equal(toggle_last_color, THINGY53_LED_GREEN,
-                "toggle should use green GPIO");
+                "toggle should use green LED");
 }
 
 ZTEST(thingy53_led, test_toggle_invalid_color_returns_einval_fail) {

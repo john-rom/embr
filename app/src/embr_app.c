@@ -46,6 +46,9 @@ embr_err_t embr_app_init(void) {
 
 embr_err_t embr_app_start(void) {
   __ASSERT(app_initialized, "embr_app_start called before embr_app_init");
+  if (!app_initialized) {
+    return -EINVAL;
+  }
   k_timer_start(&led_timer, K_MSEC(EMBR_LED_START_DELAY_MS),
                 K_MSEC(EMBR_LED_BLINK_PERIOD_MS));
   return EMBR_OK;

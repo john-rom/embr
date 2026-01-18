@@ -17,7 +17,7 @@ int thingy53_led_init_impl(void) {
 
   for (size_t i = 0; i < ARRAY_SIZE(leds); i++) {
     __ASSERT(leds[i] != NULL, "gpio spec is null");
-    if (!gpio_wrap_is_ready_dt(leds[i])) {
+    if (!leds[i] || !gpio_wrap_is_ready_dt(leds[i])) {
       return -ENODEV;
     }
 
@@ -49,6 +49,9 @@ int thingy53_led_toggle_impl(thingy53_led_color_t color) {
   }
 
   __ASSERT(spec != NULL, "gpio spec is null");
+  if (!spec) {
+    return -ENODEV;
+  }
   int err = gpio_wrap_pin_toggle_dt(spec);
   if (err) {
     return err;
