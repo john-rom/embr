@@ -11,17 +11,17 @@ int main(void) {
 
   err = embr_app_init();
   if (err) {
-    LOG_ERR("Ember init failed: %d", err);
+    LOG_ERR("embr init failed: %d", err);
     goto fatal;
   }
-  LOG_INF("Ember init success");
+  LOG_INF("embr init success");
 
   err = embr_app_start();
   if (err) {
-    LOG_ERR("Ember start failed: %d", err);
+    LOG_ERR("embr start failed: %d", err);
     goto fatal;
   }
-  LOG_INF("Ember start success");
+  LOG_INF("embr start success");
 
   k_sleep(K_FOREVER);
 

@@ -5,6 +5,7 @@
 #include "embr_app.h"
 #include "embr_error_id.h"
 #include "thingy53_led.h"
+#include "thingy53_mic.h"
 
 LOG_MODULE_REGISTER(embr_app);
 
@@ -23,13 +24,22 @@ static void led_timer_handler(struct k_timer *timer) {
 }
 
 embr_err_t embr_app_init(void) {
-  embr_err_t err = thingy53_led_init();
+  embr_err_t err = 0;
+
+  err = thingy53_led_init();
   if (err) {
     LOG_ERR("Thingy53 LED init failed: %d", err);
     return err;
   }
 
+  err = thingy53_mic_init();
+  if (err) {
+    LOG_ERR("Thingy53 DMIC init failed: %d", err);
+    return err;
+  }
+
   k_timer_init(&led_timer, led_timer_handler, NULL);
+
   app_initialized = true;
   return EMBR_OK;
 }

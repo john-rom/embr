@@ -9,4 +9,8 @@ zephyr_library_sources(
   src/thingy53_led.c
   src/thingy53_led_impl.c
   src/thingy53_led_specs.c
+  src/thingy53_mic.c
+  src/thingy53_mic_impl.c
+  src/thingy53_mic_specs.c
+
 )

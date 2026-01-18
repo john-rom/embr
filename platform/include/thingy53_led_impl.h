@@ -6,25 +6,26 @@
  * @brief Thingy53 LED implementation helpers for specific GPIO specs.
  */
 
+#include "thingy53_led.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct gpio_dt_spec;
-
 /**
- * @brief Initialize a single LED GPIO spec.
+ * @brief Initialize the Thingy53 LEDS.
  *
  * @return 0 on success, or -errno on failure.
  */
-int thingy53_led_init_impl(const struct gpio_dt_spec *spec);
+int thingy53_led_init_impl(void);
 
 /**
- * @brief Toggle a LED for the provided GPIO spec.
+ * @brief Toggle a specific Thingy53 LED.
  *
+ * @param color LED color to toggle.
  * @return 0 on success, or -errno on failure.
  */
-int thingy53_led_toggle_impl(const struct gpio_dt_spec *color);
+int thingy53_led_toggle_impl(thingy53_led_color_t color);
 
 #ifdef __cplusplus
 }

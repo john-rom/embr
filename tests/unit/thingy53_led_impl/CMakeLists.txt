@@ -10,6 +10,7 @@ target_sources(testbinary PRIVATE
   src/test_thingy53_led_impl.c
   ../../../platform/src/thingy53_led_impl.c
   ../mocks/gpio_wrap_mock.c
+  ../mocks/thingy53_led_specs_mock.c
 )
 
 target_include_directories(testbinary PRIVATE

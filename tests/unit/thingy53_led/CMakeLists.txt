@@ -10,7 +10,6 @@ target_sources(testbinary PRIVATE
   src/test_thingy53_led.c
   ../../../platform/src/thingy53_led.c
   ../mocks/thingy53_led_impl_mock.c
-  ../mocks/thingy53_led_specs_mock.c
 )
 
 target_include_directories(testbinary PRIVATE

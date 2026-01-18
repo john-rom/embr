@@ -1,0 +1,16 @@
+&i2c1 {
+    vm3011: vm3011@60  {
+        compatible = "vesper,vm3011";
+        label = "VM3011";
+        reg = <0x60>;
+        clk-pin = <41>;  
+        data-pin = <27>;
+        dout-gpios = <&gpio0 25 GPIO_ACTIVE_HIGH>;
+    };
+};
+
+/ {
+    aliases {
+        mic0 = &i2c1;
+    };
+};

@@ -9,16 +9,17 @@
  * All functions return 0 on success or -errno on failure.
  */
 
-/** LED color selector. */
-typedef enum {
-  THINGY53_LED_RED = 0,
-  THINGY53_LED_GREEN,
-  THINGY53_LED_BLUE,
-} thingy53_led_color_t;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/** LED color selector. */
+typedef enum {
+  NO_COLOR = 0,
+  THINGY53_LED_RED,
+  THINGY53_LED_GREEN,
+  THINGY53_LED_BLUE,
+} thingy53_led_color_t;
 
 /**
  * @brief Initialize all Thingy53 LEDs.
