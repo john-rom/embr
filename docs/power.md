@@ -6,7 +6,6 @@ Values are intended to provide a repeatable baseline and enable apples-to-apples
 ---
 
 ## Measurement Setup
-
 <figure>
   <img src="assets/power/t53_ppk2.png" width="600" alt="Thingy:53 connected to the PPK2)">
   <figcaption><em>Thingy:53 connected to the PPK2 via the current measurement and debug board.</em></figcaption>
@@ -27,22 +26,78 @@ Values are intended to provide a repeatable baseline and enable apples-to-apples
 
 ---
 
-## Results Summary
+## Interpretation
+The measurements below currently establish:
+- A general baseline for:
+  - Verifying the system reaches low-power idle between specific events (e.g LED blink)
+  - Comparing incremental power cost as features are added
+  - Identifying unexpected background activity early
 
-### Baseline — Blinky
+- DMIC audio capture baseline:
+  - 16 kHz sample rate
+  - Continuous capture, no sleep/idle
+
+Future profiles planned:
+- Wake-word inference bursts
+- Thread join + idle
+- Radio TX/RX bursts
+- End-to-end voice-triggered lighting control path
+
+---
+
+## Results Summary
+**Notes**
+- Results are presented in reverse chronological order. Measurements for the latest firmware/feature set will appear first.
+- For all results:
+  - Trial count: 3
+  - Capture window: 30 s per trial (steady-state time post init will be shorter)
+- Measurements:
+  -  Average current and average peak current
+  -  Measurements from DMIC bring-up and later also include: min/max, range, standard deviation (std dev), and coefficient of variance (CV)
+
+### ~~~ DMIC (PDM) Bring-up - Continuous Audio Capture ~~~
+**Behavior**
+- Audio sample rate: 16kHz
+- Mode: Mono, single channel
+- PDM buffer size: 4000 samples
+- Buffer release rate: 4 releases per second
+- Peripherals enabled: DMIC
+
+**Steady-state current (post init)**
+- Average current: 646.08 µA
+  - Min/Max: 644.98 µA / 647.29 µA
+  - Range: 2.31 µA
+  - Std dev (sample): 1.16 µA
+  - CV: 0.18%
+- Average peak current: 16.70 mA
+  - Min/Max: 16.37 mA / 17.31 mA
+  - Range: 0.94 mA
+  - Std dev (sample): 0.53 mA
+  - CV: 3.18%
+
+**Representative steady-state capture**
+<figure>
+  <img src="assets/power/embr_mic_continuous_steady_1.png" width="1200" alt="DMIC running continuous capture at 16 kHz">
+  <figcaption><em>DMIC running continuous audio capture at 16 kHz</em></figcaption>
+</figure>
+</p> 
+
+### ~~~ Baseline — Blinky ~~~
 **Behavior**
 - Blink period: 500 ms  
 - Duty cycle: 50%
 - Peripherals enabled: LED, Timer
 
-**Steady-state current (after init)**
-- Trial count: 3
-- Capture window: 30 s per trial
+**Steady-state current (post init)**
 - Average current: 10.46 µA  
 - Average peak current (blink event): 13.60 mA
 
 **Representative steady-state capture**
-![PPK2 blinky steady-state](assets/power/ppk_blinky_steady_1.png)
+<figure>
+  <img src="assets/power/ppk_blinky_steady_1.png" width="1200" alt="Blinky running with 500 ms period and 50% duty cycle">
+  <figcaption><em>Blinky running with 500 ms period and 50% duty cycle</em></figcaption>
+</figure>
+</p>
 
 ---
 
@@ -50,24 +105,12 @@ Values are intended to provide a repeatable baseline and enable apples-to-apples
 
 Boot current is recorded separately as a transient event.
 
-- Trial count: 3  
 - Average boot peak current: 53.20 mA 
 - Observations: Generally stable across boots, logging enabled
 
 **Representative boot capture**
-![PPK2 boot transient](assets/power/ppk_blinky_boot_1.png)
-
----
-
-## Interpretation
-These measurements establish a baseline for:
-- Verifying the system reaches low-power idle between specific events (LED blink, currently)
-- Comparing incremental power cost as features are added
-- Identifying unexpected background activity early
-
-Future profiles planned:
-- DMIC capture
-- Wake-word inference bursts
-- Thread join + idle
-- Radio TX/RX bursts
-- End-to-end voice-triggered lighting control path
+<figure>
+  <img src="assets/power/ppk_blinky_boot_1.png" width="1200" alt="Boot + init power sequence">
+  <figcaption><em>Boot + init power sequence</em></figcaption>
+</figure>
+</p>
