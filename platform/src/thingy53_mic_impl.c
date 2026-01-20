@@ -30,3 +30,12 @@ int thingy53_mic_start_impl(void) {
 
   return 0;
 }
+
+int thingy53_mic_stop_impl(void) {
+  int err = dmic_wrap_trigger(mic, DMIC_WRAP_TRIGGER_STOP);
+  if (err) {
+    return err;
+  }
+
+  return 0;
+}

@@ -27,6 +27,13 @@ int thingy53_mic_init(void);
  */
 int thingy53_mic_start(void);
 
+/**
+ * @brief Stop the Thingy53 DMIC.
+ *
+ * @return 0 on success, or -errno on failure.
+ */
+int thingy53_mic_stop(void);
+
 #ifdef __cplusplus
 }
 #endif

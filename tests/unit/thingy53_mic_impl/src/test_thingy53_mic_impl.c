@@ -54,18 +54,40 @@ ZTEST(thingy53_mic_impl, test_start_trigger_success) {
   int ret = thingy53_mic_start_impl();
   zassert_equal(ret, 0, "thingy53_mic_start_impl should return 0");
   zassert_equal(mock_dmic_trigger_call_count, 1,
-                "thingy53_mic_init_impl should call dmic_wrap_trigger once");
+                "thingy53_mic_start_impl should call dmic_wrap_trigger once");
   zassert_equal(mock_dmic_configure_call_count, 0,
-                "thingy53_mic_init_impl should not call dmic_wrap_configure");
+                "thingy53_mic_start_impl should not call dmic_wrap_configure");
 }
 
-ZTEST(thingy53_mic_impl, test_start_error_on_fail) {
+ZTEST(thingy53_mic_impl, test_start_error_on_trigger_fail) {
   mock_dmic_wrap_trigger_ret = -EINVAL;
 
   int ret = thingy53_mic_start_impl();
   zassert_equal(ret, -EINVAL, "thingy53_mic_start_impl should return -EINVAL");
   zassert_equal(mock_dmic_trigger_call_count, 1,
-                "thingy53_mic_init_impl should call dmic_wrap_trigger once");
+                "thingy53_mic_start_impl should call dmic_wrap_trigger once");
   zassert_equal(mock_dmic_configure_call_count, 0,
-                "thingy53_mic_init_impl should not call dmic_wrap_configure");
+                "thingy53_mic_start_impl should not call dmic_wrap_configure");
+}
+
+ZTEST(thingy53_mic_impl, test_stop_trigger_success) {
+  mock_dmic_wrap_trigger_ret = 0;
+
+  int ret = thingy53_mic_stop_impl();
+  zassert_equal(ret, 0, "thingy53_mic_stop_impl should return 0");
+  zassert_equal(mock_dmic_trigger_call_count, 1,
+                "thingy53_mic_stop_impl should call dmic_wrap_trigger once");
+  zassert_equal(mock_dmic_configure_call_count, 0,
+                "thingy53_mic_stop_impl should not call dmic_wrap_configure");
+}
+
+ZTEST(thingy53_mic_impl, test_stop_error_on_trigger_fail) {
+  mock_dmic_wrap_trigger_ret = -EINVAL;
+
+  int ret = thingy53_mic_stop_impl();
+  zassert_equal(ret, -EINVAL, "thingy53_mic_stop_impl should return -EINVAL");
+  zassert_equal(mock_dmic_trigger_call_count, 1,
+                "thingy53_mic_stop_impl should call dmic_wrap_trigger once");
+  zassert_equal(mock_dmic_configure_call_count, 0,
+                "thingy53_mic_stop_impl should not call dmic_wrap_configure");
 }
