@@ -9,3 +9,12 @@ int thingy53_mic_init(void) {
 
   return 0;
 }
+
+int thingy53_mic_start(void) {
+  int err = thingy53_mic_start_impl();
+  if (err) {
+    return err;
+  }
+
+  return 0;
+}

@@ -10,9 +10,11 @@ struct device {
 
 static const struct device mic;
 
-bool mock_thingy53_mic_device_ready = 0;
+bool mock_thingy53_mic_device_ready = false;
 
-void thingy53_mic_specs_mock_reset(void) { mock_thingy53_mic_device_ready = 0; }
+void thingy53_mic_specs_mock_reset(void) {
+  mock_thingy53_mic_device_ready = false;
+}
 
 const struct device *thingy53_mic_get_device(void) {
   if (!mock_thingy53_mic_device_ready) {

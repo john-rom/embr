@@ -10,6 +10,7 @@ target_sources(testbinary PRIVATE
   src/test_thingy53_mic_impl.c
   ../../../platform/src/thingy53_mic_impl.c
   ../mocks/thingy53_mic_specs_mock.c
+  ../mocks/dmic_wrap_mock.c
 )
 
 target_include_directories(testbinary PRIVATE

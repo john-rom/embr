@@ -20,6 +20,13 @@ extern "C" {
  */
 int thingy53_mic_init(void);
 
+/**
+ * @brief Start the Thingy53 DMIC.
+ *
+ * @return 0 on success, or -errno on failure.
+ */
+int thingy53_mic_start(void);
+
 #ifdef __cplusplus
 }
 #endif

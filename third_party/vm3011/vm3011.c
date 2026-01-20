@@ -289,7 +289,11 @@ static void vm3011_pdm_handler(nrfx_pdm_evt_t const *p_evt) {
   }
   if (p_evt->buffer_released) {
     pcm_buffer_avalable = true;
-    // do something with released buffer
+
+    /*
+     *  EMBR: custom addition
+     */
+    vm3011_buffer_released_hook();
   }
 }
 

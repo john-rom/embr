@@ -5,8 +5,10 @@
 extern "C" {
 #endif
 
-extern int init_call_count;
-extern int init_return_value;
+extern int init_impl_call_count;
+extern int init_impl_return_value;
+extern int start_impl_call_count;
+extern int start_impl_return_value;
 
 void thingy53_mic_impl_mock_reset(void);
 
