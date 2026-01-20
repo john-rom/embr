@@ -2,8 +2,8 @@
 
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/sys/atomic.h>
 #include <zephyr/sys/__assert.h>
+#include <zephyr/sys/atomic.h>
 #include <zephyr/sys/util.h>
 
 LOG_MODULE_REGISTER(embr_error);
@@ -25,6 +25,9 @@ static void embr_error_work_handler(struct k_work *work) {
       switch ((embr_error_id_t)i) {
       case EMBR_ERR_ID_LED_TOGGLE:
         LOG_ERR("LED toggle failed");
+        break;
+      case EMBR_ERR_ID_MIC:
+        LOG_ERR("Mic operation failed");
         break;
       default:
         LOG_ERR("Unknown error id: %d", i);

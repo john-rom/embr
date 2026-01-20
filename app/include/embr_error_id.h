@@ -17,6 +17,7 @@ extern "C" {
 /** Error identifiers used with embr_error_report(). */
 typedef enum {
   EMBR_ERR_ID_LED_TOGGLE = 0,
+  EMBR_ERR_ID_MIC,
   EMBR_ERR_ID_COUNT,
 } embr_error_id_t;
 
