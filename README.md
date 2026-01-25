@@ -79,7 +79,7 @@ platform seams, and unit tests; additional modules and the end-to-end voice pipe
 ### Build
 From the project root directory:
 ```text
-west build -p -b thingy53_nrf5340_cpuapp
+west build -p always -b thingy53_nrf5340_cpuapp
 ```
 This will do a pristine build for the Thingy:53 target board (assuming a secure deployment environment).
 
