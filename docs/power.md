@@ -16,7 +16,7 @@ Values are intended to provide a repeatable baseline and enable apples-to-apples
 **Measurement mode**: Ammeter mode (target powered through PPK2)  
 **Supply voltage**: 3.12 V (measured at Thingy:53 VIN with DMM; PPK2 VOUT → VIN)  
 **Target hardware**: Nordic Thingy:53  
-**Firmware state**: Blinky baseline (tag v0.1.0)  
+**Firmware state**: DMIC continuous capture (tag v0.2.0)  
 **Logging**: RTT
 
 **Notes**
@@ -38,7 +38,7 @@ The measurements below currently establish:
   - Continuous capture, no sleep/idle
 
 Future profiles planned:
-- Wake-word inference bursts
+- Wake-word bursts, with and without subsequent inference
 - Thread join + idle
 - Radio TX/RX bursts
 - End-to-end voice-triggered lighting control path
