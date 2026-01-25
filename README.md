@@ -9,7 +9,7 @@
   <img src="docs/assets/embr_logo_dark.png#gh-dark-mode-only" alt="embr logo" width="280" />
 </p>
 
-**embr** is a wireless, embedded voice-control system built to make lighting respond quickly and naturally. It wakes on command, 
+**embr** is a wireless, embedded voice-control system built to make Matter-enabled lighting respond quickly and naturally. It wakes on command, 
 processes your voice locally, and triggers lighting changes in milliseconds, all designed around low power, real-time technology.
 
 It combines on-device keyword detection with Thread networking to deliver responsive smart-light control across a local mesh. 
