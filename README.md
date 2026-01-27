@@ -55,6 +55,7 @@ platform seams, and unit tests; additional modules and the end-to-end voice pipe
 - `boards/` → board-specific overlays and build configuration
 - `docs/` → documentation and README assets (images, diagrams)
 - `platform/` → platform abstractions (drivers, wrappers, portability seams)
+- `scripts/` → helper scripts (docs, tooling)
 - `src/` → application entry points / glue code
 - `tests/unit/` → unit tests executed via Zephyr's Twister
 - `third_party/` → external dependencies and vendor libraries
