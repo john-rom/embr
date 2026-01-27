@@ -3,16 +3,11 @@
 #include <zephyr/sys/reboot.h>
 
 #include "embr_app.h"
-#include "vm3011.h"
 
 LOG_MODULE_REGISTER(app);
 
-K_SEM_DEFINE(pdm_smphr, 0, 1);
-
-void vm3011_buffer_released_hook(void) { k_sem_give(&pdm_smphr); }
-
 int main(void) {
-  embr_err_t err = 0;
+  embr_err_t err = EMBR_OK;
 
   err = embr_app_init();
   if (err) {

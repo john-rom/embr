@@ -138,6 +138,14 @@ typedef enum {
   HZ_48000 = 48000UL
 } dmic_out_sample_rate;
 
+/*
+ *  EMBR: custom addition
+ */
+typedef enum {
+  VM3011_ERR_PDM_OVERFLOW = 0,
+  VM3011_ERR_PDM_SET_BUFFER,
+} vm3011_error_t; /* EMBR */
+
 struct vm3011_config {
   const struct device *i2c_dev;
   uint16_t i2c_address;
@@ -146,11 +154,12 @@ struct vm3011_config {
   gpio_pin_t clk_pin;
   bool lr_pin_level;
 
+  /*
+   *  EMBR: custom modification
+   */
 #if defined(CONFIG_VM3011_INT)
-  const char *gpio_port;
-  gpio_pin_t dout_pin;
-  gpio_dt_flags_t dout_flags;
-#endif
+  struct gpio_dt_spec dout;
+#endif /* EMBR */
 };
 
 struct vm3011_data {
@@ -165,5 +174,6 @@ struct vm3011_data {
  *  EMBR: custom addition
  */
 __weak void vm3011_buffer_released_hook(void);
+__weak void vm3011_error_hook(vm3011_error_t err); /* EMBR */
 
 #endif /* __VM3011_H__ */

@@ -26,8 +26,11 @@ static void embr_error_work_handler(struct k_work *work) {
       case EMBR_ERR_ID_LED_TOGGLE:
         LOG_ERR("LED toggle failed");
         break;
-      case EMBR_ERR_ID_MIC:
-        LOG_ERR("Mic operation failed");
+      case EMBR_ERR_ID_PDM_OVERFLOW:
+        LOG_ERR("PDM overflow");
+        break;
+      case EMBR_ERR_ID_PDM_SET_BUFFER:
+        LOG_ERR("PDM set buffer failed");
         break;
       default:
         LOG_ERR("Unknown error id: %d", i);
@@ -44,7 +47,7 @@ static void embr_error_work_handler(struct k_work *work) {
 }
 
 void embr_error_report(embr_error_id_t id) {
-  __ASSERT((int)id >= 0 && id < EMBR_ERR_ID_COUNT, "invalid error id");
+  __ASSERT((int)id >= 0 && id < EMBR_ERR_ID_COUNT, "Invalid error id");
   if ((int)id < 0 || id >= EMBR_ERR_ID_COUNT) {
     return;
   }

@@ -16,7 +16,7 @@ ZTEST(thingy53_led, test_init_returns_zero_on_success) {
 
   int ret = thingy53_led_init();
   zassert_equal(ret, 0, "thingy53_led_init should return 0");
-  zassert_equal(init_call_count, 1, "init should be called once");
+  zassert_equal(init_call_count, 1, "thingy53_led_init should be called once");
 }
 
 ZTEST(thingy53_led, test_init_returns_error_on_fail) {
@@ -31,9 +31,10 @@ ZTEST(thingy53_led, test_toggle_calls_impl_with_color_success) {
 
   int ret = thingy53_led_toggle(THINGY53_LED_GREEN);
   zassert_equal(ret, 0, "thingy53_led_toggle should return 0");
-  zassert_equal(toggle_call_count, 1, "toggle should be called once");
+  zassert_equal(toggle_call_count, 1,
+                "thingy53_led_toggle should be called once");
   zassert_equal(toggle_last_color, THINGY53_LED_GREEN,
-                "toggle should use green LED");
+                "thingy53_led_toggle should use green LED");
 }
 
 ZTEST(thingy53_led, test_toggle_invalid_color_returns_einval_fail) {
@@ -41,6 +42,7 @@ ZTEST(thingy53_led, test_toggle_invalid_color_returns_einval_fail) {
   toggle_return_value = -EINVAL;
 
   int ret = thingy53_led_toggle(color);
-  zassert_equal(ret, -EINVAL, "invalid color should return -EINVAL");
-  zassert_equal(toggle_call_count, 1, "toggle should be called once");
+  zassert_equal(ret, -EINVAL, "Invalid color should return -EINVAL");
+  zassert_equal(toggle_call_count, 1,
+                "thingy53_led_toggle should be called once");
 }

@@ -11,6 +11,7 @@ extern int mock_dmic_wrap_configure_ret;
 extern int mock_dmic_wrap_trigger_ret;
 extern int mock_dmic_configure_call_count;
 extern int mock_dmic_trigger_call_count;
+extern dmic_trigger_t mock_dmic_last_trigger_cmd;
 
 void dmic_wrap_mock_reset(void);
 

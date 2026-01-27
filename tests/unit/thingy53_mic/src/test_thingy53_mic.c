@@ -44,9 +44,49 @@ ZTEST(thingy53_mic, test_start_returns_zero_on_success) {
 ZTEST(thingy53_mic, test_start_returns_error_on_fail) {
   start_impl_return_value = -EINVAL;
   int ret = thingy53_mic_start();
-  zassert_equal(ret, -EINVAL, "thingy53_mic_start should return -ENODEV");
+  zassert_equal(ret, -EINVAL, "thingy53_mic_start should return -EINVAL");
   zassert_equal(start_impl_call_count, 1,
                 "thingy53_mic_start should be called once");
+  zassert_equal(init_impl_call_count, 0,
+                "thingy53_mic_init_impl should not be called");
+}
+
+ZTEST(thingy53_mic, test_stop_returns_zero_on_success) {
+  stop_impl_return_value = 0;
+  int ret = thingy53_mic_stop();
+  zassert_equal(ret, 0, "thingy53_mic_stop should return 0");
+  zassert_equal(stop_impl_call_count, 1,
+                "thingy53_mic_stop should be called once");
+  zassert_equal(init_impl_call_count, 0,
+                "thingy53_mic_init_impl should not be called");
+}
+
+ZTEST(thingy53_mic, test_stop_returns_error_on_fail) {
+  stop_impl_return_value = -EINVAL;
+  int ret = thingy53_mic_stop();
+  zassert_equal(ret, -EINVAL, "thingy53_mic_stop should return -EINVAL");
+  zassert_equal(stop_impl_call_count, 1,
+                "thingy53_mic_stop should be called once");
+  zassert_equal(init_impl_call_count, 0,
+                "thingy53_mic_init_impl should not be called");
+}
+
+ZTEST(thingy53_mic, test_reset_returns_zero_on_success) {
+  reset_impl_return_value = 0;
+  int ret = thingy53_mic_reset();
+  zassert_equal(ret, 0, "thingy53_mic_reset should return 0");
+  zassert_equal(reset_impl_call_count, 1,
+                "thingy53_mic_reset should be called once");
+  zassert_equal(init_impl_call_count, 0,
+                "thingy53_mic_init_impl should not be called");
+}
+
+ZTEST(thingy53_mic, test_reset_returns_error_on_fail) {
+  reset_impl_return_value = -EIO;
+  int ret = thingy53_mic_reset();
+  zassert_equal(ret, -EIO, "thingy53_mic_reset should return -EIO");
+  zassert_equal(reset_impl_call_count, 1,
+                "thingy53_mic_reset should be called once");
   zassert_equal(init_impl_call_count, 0,
                 "thingy53_mic_init_impl should not be called");
 }

@@ -16,6 +16,9 @@ extern "C" {
 /**
  * @brief Initialize the Thingy53 DMIC.
  *
+ * Idempotent when already initialized and not streaming. Call deinit to
+ * reapply configuration changes.
+ *
  * @return 0 on success, or -errno on failure.
  */
 int thingy53_mic_init(void);
@@ -33,6 +36,22 @@ int thingy53_mic_start(void);
  * @return 0 on success, or -errno on failure.
  */
 int thingy53_mic_stop(void);
+
+/**
+ * @brief Deinitialize the Thingy53 DMIC state.
+ *
+ * Clears initialization/streaming state so init can apply new configuration.
+ *
+ * @return 0 on success, or -errno on failure.
+ */
+int thingy53_mic_deinit(void);
+
+/**
+ * @brief Reset the Thingy53 DMIC.
+ *
+ * @return 0 on success, or -errno on failure.
+ */
+int thingy53_mic_reset(void);
 
 #ifdef __cplusplus
 }

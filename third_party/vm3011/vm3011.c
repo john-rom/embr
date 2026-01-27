@@ -29,7 +29,33 @@ LOG_MODULE_REGISTER(vm3011, LOG_LEVEL_DBG);
 static struct vm3011_data vm3011_data;
 static int16_t pcm_buffer[2][CONFIG_VM3011_PDM_BUFFER_SIZE];
 static uint8_t pcm_buffer_in_use = 0;
-static bool pcm_buffer_avalable = false;
+static bool pcm_buffer_available = false;
+
+/*
+ *  EMBR: custom addition
+ */
+static dmic_op_mode vm3011_mode_from_clock(uint32_t clock_freq) {
+  if (clock_freq >= VM3011_NORMAL_MODE_MIN &&
+      clock_freq <= VM3011_NORMAL_MODE_MAX) {
+    return NORMAL;
+  }
+  if (clock_freq >= VM3011_LOW_POWER_MODE_MIN &&
+      clock_freq <= VM3011_LOW_POWER_MODE_MAX) {
+    return LOW_POWER;
+  }
+  if (clock_freq >= VM3011_STANDBY_MODE_MIN &&
+      clock_freq <= VM3011_STANDBY_MODE_MAX) {
+    return STANDBY;
+  }
+  return ZPL;
+} /* EMBR */
+
+/*
+ *  EMBR: custom addition
+ */
+static inline void vm3011_report_error(vm3011_error_t err) {
+  vm3011_error_hook(err);
+} /* EMBR */
 
 static const struct vm3011_config vm3011_cfg = {
     .i2c_dev = DEVICE_DT_GET(DT_ALIAS(mic0)),
@@ -37,11 +63,12 @@ static const struct vm3011_config vm3011_cfg = {
     .data_pin = DT_INST_PROP(0, data_pin),
     .clk_pin = DT_INST_PROP(0, clk_pin),
     .lr_pin_level = DT_INST_PROP(0, lr_select),
+/*
+ *  EMBR: custom modification
+ */
 #if defined(CONFIG_VM3011_INT)
-    //.gpio_port = DT_INST_GPIO_LABEL(0, dout_gpios),
-    .dout_pin = DT_INST_GPIO_PIN(0, dout_gpios),
-    .dout_flags = DT_INST_GPIO_FLAGS(0, dout_gpios),
-#endif
+    .dout = GPIO_DT_SPEC_GET(DT_INST(0, vesper_vm3011), dout_gpios),
+#endif /* EMBR */
 };
 
 static inline int vm3011_get_reg(const struct device *dev,
@@ -273,10 +300,31 @@ static int vm3011_amb_sound_lvl_get(const struct device *dev,
   return 0;
 }
 
+/*
+ *  EMBR: custom addition
+ */
+#if defined(CONFIG_VM3011_INT)
+static struct gpio_callback wos_cb;
+
+__weak void vm3011_wos_triggered_hook(void) {}
+
+static void vm3011_wos_handler(const struct device *port,
+                               struct gpio_callback *cb, uint32_t pins) {
+  ARG_UNUSED(port);
+  ARG_UNUSED(cb);
+  ARG_UNUSED(pins);
+  vm3011_wos_triggered_hook();
+}
+#endif /* EMBR */
+
 static void vm3011_pdm_handler(nrfx_pdm_evt_t const *p_evt) {
   uint32_t ret;
   if (p_evt->error != NRFX_PDM_NO_ERROR) {
-    LOG_ERR("PDM buffer overflow");
+    /*
+     *  EMBR: custom addition
+     */
+    vm3011_report_error(VM3011_ERR_PDM_OVERFLOW); /* EMBR */
+    // LOG_ERR("PDM buffer overflow");
   }
 
   if (p_evt->buffer_requested) {
@@ -284,16 +332,20 @@ static void vm3011_pdm_handler(nrfx_pdm_evt_t const *p_evt) {
     ret = nrfx_pdm_buffer_set(&pcm_buffer[pcm_buffer_in_use][0],
                               CONFIG_VM3011_PDM_BUFFER_SIZE);
     if (ret != NRFX_SUCCESS) {
-      LOG_ERR("Failed to set buffer, error %d", ret);
+      /*
+       *  EMBR: custom addition
+       */
+      vm3011_report_error(VM3011_ERR_PDM_SET_BUFFER); /* EMBR */
+      // LOG_ERR("Failed to set buffer, error %d", ret);
     }
   }
   if (p_evt->buffer_released) {
-    pcm_buffer_avalable = true;
+    pcm_buffer_available = true;
 
     /*
      *  EMBR: custom addition
      */
-    vm3011_buffer_released_hook();
+    vm3011_buffer_released_hook(); /* EMBR */
   }
 }
 
@@ -492,14 +544,25 @@ static int vm3011_get_command(const struct device *dev, enum dmic_trigger cmd) {
   case DMIC_TRIGGER_START:
     /* The frequency is already set from vm3011_configure.
      * If vm3011_configure was not first called, do nothing. */
+
+    /*
+     *  EMBR: custom modification
+     *    Allow START from ZPL when configuration is already cached; ZPL is used
+     *    for WOS between captures, so reconfigure-every-time is unnecessary.
+     */
     if (dmic_data->vm3011_current_mode == NORMAL ||
-        dmic_data->vm3011_current_mode == LOW_POWER) {
+        dmic_data->vm3011_current_mode == LOW_POWER ||
+        dmic_data->vm3011_current_mode == ZPL) {
 
       ret = nrfx_pdm_start();
       if (ret != NRFX_SUCCESS) {
         LOG_ERR("Failed to start PDM sampling, error %d", ret);
         return ret;
       }
+      if (dmic_data->vm3011_current_mode == ZPL) {
+        dmic_data->vm3011_current_mode =
+            vm3011_mode_from_clock(pdm_param->clock_freq);
+      } /* EMBR */
     } else {
       LOG_WRN("Must configure the vm3011 before starting sampling");
     }
@@ -527,12 +590,12 @@ static int vm3011_read_pdm(const struct device *dev, uint8_t stream,
   ARG_UNUSED(dev);
   ARG_UNUSED(stream);
   ARG_UNUSED(timeout);
-  if (pcm_buffer_avalable) {
+  if (pcm_buffer_available) {
     /* Return pointer to 0th address of sampled buffer */
     *buffer = &pcm_buffer[pcm_buffer_in_use ^ 1][0];
     /* Return the size of the buffer in bytes */
     *size = sizeof(pcm_buffer[0]);
-    pcm_buffer_avalable = false;
+    pcm_buffer_available = false;
   } else {
     *buffer = NULL;
     *size = 0;
@@ -625,6 +688,32 @@ static int vm3011_init(const struct device *dev) {
   if (vm3011_chip_init(dev) < 0) {
     return -EINVAL;
   }
+
+  /*
+   *  EMBR: custom addition
+   */
+#if defined(CONFIG_VM3011_INT)
+  if (!device_is_ready(vm3011_cfg.dout.port)) {
+    return -ENODEV;
+  }
+  int err = gpio_pin_configure_dt(&vm3011_cfg.dout, GPIO_INPUT);
+  if (err) {
+    return err;
+  }
+
+  err = gpio_pin_interrupt_configure_dt(&vm3011_cfg.dout,
+                                        GPIO_INT_EDGE_TO_ACTIVE);
+  if (err) {
+    return err;
+  }
+
+  gpio_init_callback(&wos_cb, vm3011_wos_handler, BIT(vm3011_cfg.dout.pin));
+
+  err = gpio_add_callback(vm3011_cfg.dout.port, &wos_cb);
+  if (err) {
+    return err;
+  }
+#endif /* EMBR */
 
   dmic_data->vm3011_current_mode = ZPL;
   IRQ_CONNECT(PDM0_IRQn, 6, nrfx_pdm_irq_handler, NULL, 0);
