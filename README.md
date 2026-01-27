@@ -20,19 +20,13 @@ connect with an entire set of drop-in AI modules to support autonomous, intellig
 
 ## Status + Roadmap
   ### Implemented
-  - Essential board and Zephyr RTOS bring-up, with logging over SEGGER RTT
-  - Early hardware bring-up: functional GPIO wrapper and LED modules
-  - Mic module scaffolding: VM3011 digital MEMS mic integration (driver + DTS)
-  - Minimal application lifecycle API, running continuous DMIC audio capture
-  - Unit testing infrastructure: Zephyr's Twister runs unit tests with mocks using the Ztest framework
-  - Continuous Integration: GitHub Actions workflow up and running via self-hosted runner
-  - Basic Doxygen documentation
-  - Power profiling and reporting, with Nordic PPK2
-  - DMIC bring-up, validation, and continuous audio capture
-  - LED + Mic module unit tests
+  - Core board bring-up, logging, and platform wrappers (GPIO/LED/mic)
+  - WOS-triggered DMIC capture window + mic lifecycle controls (start/stop/reset/deinit)
+  - Unit tests (Twister/Ztest), CI, and basic Doxygen docs
+  - PPK2 power baselines (blinky + DMIC continuous capture)
 
   ### Next
-  - Bring-up and validation of mic wake-on-sound capability
+  - Validate WOS sensitivity and capture window
 
   ### Planned
   - Edge Impulse wrapper with local model integration + stubbing for CI
