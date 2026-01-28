@@ -3,6 +3,7 @@
 #include <zephyr/sys/__assert.h>
 #include <zephyr/sys/util.h>
 
+#include "dmic_wrap.h"
 #include "embr_app.h"
 #include "embr_error_id.h"
 #include "thingy53_led.h"
@@ -10,9 +11,11 @@
 #include "vm3011.h"
 
 #define NO_SLICES 0
-#define SAMPLES_PER_INFERENCE_WINDOW 16000
+#define SAMPLES_PER_INFERENCE_WINDOW DMIC_WRAP_SAMPLE_RATE_HZ
 #define SLICES_PER_INFERENCE_WINDOW                                            \
   (SAMPLES_PER_INFERENCE_WINDOW / CONFIG_VM3011_PDM_BUFFER_SIZE)
+#define FIRST_BUFFER_MIN_MS                                                    \
+  ((CONFIG_VM3011_PDM_BUFFER_SIZE * 1000) / DMIC_WRAP_SAMPLE_RATE_HZ - 50)
 
 BUILD_ASSERT(SLICES_PER_INFERENCE_WINDOW <= UINT8_MAX,
              "slices_just_captured must fit in uint8_t");
@@ -51,6 +54,8 @@ static void led_off_work_handler(struct k_work *work) {
 
 static bool app_initialized = false;
 
+enum capture_state { CAPTURE_IDLE = 0, CAPTURE_CAPTURING };
+
 embr_err_t embr_app_init(void) {
   embr_err_t err = EMBR_OK;
 
@@ -79,14 +84,16 @@ embr_err_t embr_app_start(void) {
     return -EINVAL;
   }
 
-  static uint8_t slices_just_captured = 0;
   embr_err_t err = EMBR_OK;
-  static bool capture_completed = false;
+
+  static enum capture_state capture_state = CAPTURE_IDLE;
+  static uint8_t slices_just_captured = 0;
+  static bool skip_first_slice = false;
+  static int64_t capture_start_ms = 0;
 
   while (1) {
-    switch (slices_just_captured) {
-    case NO_SLICES:
-      capture_completed = false;
+    if (capture_state == CAPTURE_IDLE) {
+      slices_just_captured = NO_SLICES;
       k_sem_take(&wos_smphr, K_FOREVER);
 
       led_blink.color = THINGY53_LED_GREEN;
@@ -96,29 +103,41 @@ embr_err_t embr_app_start(void) {
       if (err) {
         return err;
       }
-      break;
-
-    case SLICES_PER_INFERENCE_WINDOW:
-      err = thingy53_mic_stop();
-      if (err) {
-        return err;
-      }
-      k_work_submit(&led_blink.off_work);
-      err = thingy53_mic_reset();
-      if (err) {
-        return err;
-      }
-      slices_just_captured = 0;
-      capture_completed = true;
-      break;
-
-    default:
-      break;
+      // First buffer after start can contain partial or bad data;
+      // Discard it to get a proper window
+      skip_first_slice = true;
+      capture_start_ms = k_uptime_get();
+      capture_state = CAPTURE_CAPTURING;
     }
-    if (!capture_completed) {
+
+    if (capture_state == CAPTURE_CAPTURING) {
       k_sem_take(&pdm_smphr, K_FOREVER);
-      // Move to inference pipeline
-      slices_just_captured++;
+      if (skip_first_slice) {
+        int64_t elapsed_ms = k_uptime_get() - capture_start_ms;
+        skip_first_slice = false;
+        if (elapsed_ms < FIRST_BUFFER_MIN_MS) {
+          continue;
+        }
+        // First buffer was full-length; count it.
+        slices_just_captured++;
+      } else {
+        // Move to inference pipeline
+        slices_just_captured++;
+      }
+
+      if (slices_just_captured >= SLICES_PER_INFERENCE_WINDOW) {
+        err = thingy53_mic_stop();
+        if (err) {
+          return err;
+        }
+        k_work_submit(&led_blink.off_work);
+        err = thingy53_mic_reset();
+        if (err) {
+          return err;
+        }
+        slices_just_captured = 0;
+        capture_state = CAPTURE_IDLE;
+      }
     }
   }
 

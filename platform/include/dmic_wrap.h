@@ -8,11 +8,14 @@
  * Thin wrappers around Zephyr DMIC functions, used to enable mocking in tests.
  */
 
+#define DMIC_WRAP_SAMPLE_RATE_HZ 16000UL
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct device;
+
 typedef enum {
   DMIC_WRAP_TRIGGER_STOP,
   DMIC_WRAP_TRIGGER_START,

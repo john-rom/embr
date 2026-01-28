@@ -4,13 +4,11 @@
 
 #include "dmic_wrap.h"
 
-#define DMIC_WRAP_RATE_16K 16000UL
-
 static struct pcm_stream_cfg stream_cfg;
 static struct dmic_cfg dmic_cfg_internal;
 
 int dmic_wrap_configure(const struct device *dev) {
-  stream_cfg.pcm_rate = DMIC_WRAP_RATE_16K;
+  stream_cfg.pcm_rate = DMIC_WRAP_SAMPLE_RATE_HZ;
   dmic_cfg_internal.streams = &stream_cfg;
 
   return dmic_configure(dev, &dmic_cfg_internal);
