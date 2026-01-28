@@ -23,13 +23,13 @@ connect with an entire set of drop-in AI modules to support autonomous, intellig
   - Core board bring-up, logging, and platform wrappers (GPIO/LED/mic)
   - WOS-triggered DMIC capture window + mic lifecycle controls (start/stop/reset/deinit)
   - Unit tests (Twister/Ztest), CI, and basic Doxygen docs
-  - PPK2 power baselines (blinky + DMIC continuous capture)
+  - PPK2 power baselines (blinky, DMIC continuous capture, DMIC WOS events)
+  - WOS capture window validation, via power profiling
 
   ### Next
-  - Validate WOS sensitivity and capture window
+  - Edge Impulse wrapper with local model integration + stubbing for CI
 
   ### Planned
-  - Edge Impulse wrapper with local model integration + stubbing for CI
   - Application-level modules: inference + command mapping
   - Minimal inference pipeline evaluation:
       - voice command → DMIC → EI inference → lighting command → on-board LED
