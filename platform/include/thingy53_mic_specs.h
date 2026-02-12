@@ -8,16 +8,16 @@
  * Provides a devicetree-backed DMIC device.
  */
 
+struct device;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct device;
-
 /**
  * @brief Get the Thingy53 DMIC device.
  *
- * @return Pointer to the Thingy53 DMIC device.
+ * @return Pointer to the Thingy53 DMIC device
  */
 const struct device *thingy53_mic_get_device(void);
 

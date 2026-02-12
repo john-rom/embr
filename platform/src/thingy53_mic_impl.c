@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <zephyr/sys/__assert.h>
 
 #include "dmic_wrap.h"
@@ -86,6 +87,22 @@ int thingy53_mic_reset_impl(void) {
   }
 
   mic_streaming = false;
+
+  return 0;
+}
+
+int thingy53_mic_read_impl(void **buffer, size_t *size, int32_t timeout) {
+  __ASSERT(mic_initialized, "DMIC not initialized");
+  if (!mic_initialized) {
+    return -ENODEV;
+  }
+  if (buffer == NULL || size == NULL) {
+    return -EINVAL;
+  }
+  int err = dmic_wrap_read(mic, 0, buffer, size, timeout);
+  if (err) {
+    return err;
+  }
 
   return 0;
 }

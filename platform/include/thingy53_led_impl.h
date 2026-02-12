@@ -13,17 +13,17 @@ extern "C" {
 #endif
 
 /**
- * @brief Initialize the Thingy53 LEDS.
+ * @brief Initialize the Thingy53 LEDs.
  *
- * @return 0 on success, or -errno on failure.
+ * @return 0 on success, or -errno on failure
  */
 int thingy53_led_init_impl(void);
 
 /**
  * @brief Toggle a specific Thingy53 LED.
  *
- * @param color LED color to toggle.
- * @return 0 on success, or -errno on failure.
+ * @param color LED color to toggle
+ * @return 0 on success, or -errno on failure
  */
 int thingy53_led_toggle_impl(thingy53_led_color_t color);
 

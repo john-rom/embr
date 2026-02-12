@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <stdint.h>
 #include <zephyr/audio/dmic.h>
 #include <zephyr/device.h>
 
@@ -29,4 +30,9 @@ int dmic_wrap_trigger(const struct device *dev, dmic_trigger_t cmd) {
   default:
     return -EINVAL;
   }
+}
+
+int dmic_wrap_read(const struct device *dev, uint8_t stream, void **buffer,
+                   size_t *size, int32_t timeout) {
+  return dmic_read(dev, stream, buffer, size, timeout);
 }

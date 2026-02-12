@@ -11,6 +11,7 @@
 
 / {
     aliases {
+        /* VM3011 third_party driver resolves DT_ALIAS(mic0) as its I2C bus. */
         mic0 = &i2c1;
     };
 };

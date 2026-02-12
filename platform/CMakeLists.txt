@@ -5,6 +5,7 @@ zephyr_library_include_directories(
 )
 
 zephyr_library_sources(
+  src/kernel_wrap.c
   src/dmic_wrap.c
   src/gpio_wrap.c
   src/thingy53_led.c
