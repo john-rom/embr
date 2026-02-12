@@ -1,0 +1,5 @@
+tests:
+  unit.embr_classify:
+    tags: embr classify
+    type: unit
+    platform_allow: unit_testing

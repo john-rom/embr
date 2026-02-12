@@ -1,0 +1,5 @@
+tests:
+  unit.embr_app_logic:
+    tags: embr app_logic
+    type: unit
+    platform_allow: unit_testing

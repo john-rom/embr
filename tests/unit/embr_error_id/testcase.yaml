@@ -1,0 +1,5 @@
+tests:
+  unit.embr_error_id:
+    tags: embr error
+    type: unit
+    platform_allow: unit_testing
