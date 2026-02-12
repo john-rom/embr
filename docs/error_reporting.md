@@ -1,7 +1,7 @@
 # Error Reporting Architecture
 
-This document describes how embr reports errors across ISR, driver, and
-application layers without blocking or excessive latency.
+This document describes how `embr` reports errors across ISR, driver, and
+application layers without blocking.
 
 ## Goals
 
@@ -11,7 +11,7 @@ application layers without blocking or excessive latency.
 
 ## Overview
 
-embr uses an error ID mechanism for asynchronous reporting:
+`embr` uses an error ID mechanism for asynchronous reporting:
 
 - **Producers** call `embr_error_report()` from ISR or callback contexts.
 - **The error module** coalesces error IDs and schedules deferred work.
@@ -20,7 +20,7 @@ embr uses an error ID mechanism for asynchronous reporting:
 ## Reporting Flow
 
 1. **Report**: A driver or callback calls `embr_error_report(ERROR_ID)`.
-2. **Defer**: The error module sets a bit and schedules deferred work.
+2. **Defer**: The module sets a pending bit and schedules work.
 3. **Handle**: The work handler iterates all pending IDs.
 4. **App policy**: The registered app handler logs and can later add counters,
    telemetry, or escalation.
@@ -31,9 +31,9 @@ embr uses an error ID mechanism for asynchronous reporting:
 - **LED work handler** reports toggle failures when the deferred LED-off
   toggle fails.
 
-App-level errors that can be handled synchronously (e.g., init failures or
-state machine errors) are logged and returned directly, rather than going
-through the deferred error ID path.
+App-level errors that can be handled synchronously (for example init failures
+or state-machine failures) are logged and returned directly instead of going
+through deferred error IDs.
 
 ## Error ID Mapping
 
@@ -41,10 +41,19 @@ through the deferred error ID path.
 messages. Centralizing this mapping keeps strings stable across the codebase and
 avoids duplicated switch logic in the app.
 
+## Runtime Details
+
+- The deferred transport uses one global work item via `kernel_wrap_work_*`.
+- `embr_error_report()` initializes that work item lazily on first use.
+- Work submission is retried up to 3 times; repeated submission failure drops
+  pending bits to avoid stale replay.
+- Internal diagnostics are available through `embr_error_get_stats()`:
+  `work_init_fail_count` and `work_submit_fail_count` (both saturating `uint8_t`).
+
 ## Notes
 
-- Repeated errors are **coalesced** per work cycle to avoid log floods.
-- The system is safe for **ISR or high-priority callbacks** because reporting
-  does not block or allocate.
-- If no handler is registered, errors reported via `embr_error_report()` are
-  dropped (no logging). This does not affect direct app-layer logging.
+- Repeated IDs are coalesced per work cycle to avoid log floods.
+- Reporting is safe for ISR/high-priority callbacks because it only sets bits
+  and attempts deferred submission.
+- If no handler is registered, deferred IDs are dropped (no logging). This does
+  not affect direct synchronous app-layer logging.
