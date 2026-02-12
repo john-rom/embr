@@ -7,7 +7,7 @@
 LOG_MODULE_REGISTER(app);
 
 int main(void) {
-  embr_err_t err = EMBR_OK;
+  int err = 0;
 
   err = embr_app_init();
   if (err) {

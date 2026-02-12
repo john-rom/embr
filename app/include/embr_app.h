@@ -3,25 +3,22 @@
 
 /**
  * @file embr_app.h
- * @brief Ember application lifecycle API.
+ * @brief embr application runtime shell API.
+ *
+ * This module is the runtime shell: it owns Zephyr-facing orchestration
+ * (init/start sequencing, hooks, and runtime loop wiring). Pure transition
+ * decisions are delegated to embr_app_logic.
  *
  * Return convention:
- * - 0 (EMBR_OK) on success
+ * - 0 on success
  * - Negative error code on failure; -errno when applicable
  */
 
-#include <stdbool.h>
+struct k_sem;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef int embr_err_t;
-
-#define EMBR_OK 0
-
-static inline bool embr_ok(embr_err_t e) { return e == 0; }
-static inline bool embr_fail(embr_err_t e) { return e < 0; }
 
 /**
  * @brief Initialize application state and dependencies.
@@ -29,18 +26,46 @@ static inline bool embr_fail(embr_err_t e) { return e < 0; }
  * Sets up internal state and any subsystems required before the main
  * application loop starts.
  *
- * @return 0 (EMBR_OK) on success; negative error code on failure.
+ * @return 0 on success; negative error code on failure
  */
-embr_err_t embr_app_init(void);
+int embr_app_init(void);
 
 /**
  * @brief Start the application runtime.
  *
  * Kicks off the main application flow after successful initialization.
  *
- * @return 0 (EMBR_OK) on success; no failure mode currently implemented.
+ * @return 0 on success, or negative error code on failure
  */
-embr_err_t embr_app_start(void);
+int embr_app_start(void);
+
+/**
+ * @brief Turn on the capture indicator LED.
+ *
+ * @return 0 on success, or -errno on failure
+ */
+int embr_app_led_toggle_on_capture_start(void);
+
+/**
+ * @brief Defer capture-end indicator LED toggle via work queue.
+ *
+ * @return 0 on success, or -errno on failure
+ */
+int embr_app_led_toggle_on_capture_end_async(void);
+
+/**
+ * @brief Get the WOS semaphore used for capture synchronization.
+ *
+ * @return Pointer to the WOS semaphore
+ */
+struct k_sem *embr_app_wos_sem(void);
+
+/**
+ * @brief Get the PDM semaphore used for buffer release synchronization.
+ *
+ * @return Pointer to the PDM semaphore
+ */
+struct k_sem *embr_app_pdm_sem(void);
 
 #ifdef __cplusplus
 }
