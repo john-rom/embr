@@ -1,6 +1,11 @@
 #ifndef THINGY53_MIC_SPECS_MOCK_H_
 #define THINGY53_MIC_SPECS_MOCK_H_
 
+/**
+ * @file thingy53_mic_specs_mock.h
+ * @brief Mock helpers for Thingy53 mic specs.
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
 

@@ -1,16 +1,21 @@
 #ifndef GPIO_WRAP_MOCK_H_
 #define GPIO_WRAP_MOCK_H_
 
+/**
+ * @file gpio_wrap_mock.h
+ * @brief Mock helpers for GPIO wrapper API.
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 struct gpio_dt_spec {
   uint8_t dummy;
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern bool mock_gpio_wrap_is_ready_ret;
 extern int mock_gpio_wrap_pin_configure_ret;

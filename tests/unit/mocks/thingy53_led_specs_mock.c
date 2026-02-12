@@ -2,18 +2,18 @@
 #include "thingy53_led_specs.h"
 
 static const struct gpio_dt_spec mock_spec;
-const struct gpio_dt_spec *mock_thingy53_led_get_red = &mock_spec;
-const struct gpio_dt_spec *mock_thingy53_led_get_green = &mock_spec;
-const struct gpio_dt_spec *mock_thingy53_led_get_blue = &mock_spec;
+const struct gpio_dt_spec *mock_thingy53_led_red_spec = &mock_spec;
+const struct gpio_dt_spec *mock_thingy53_led_green_spec = &mock_spec;
+const struct gpio_dt_spec *mock_thingy53_led_blue_spec = &mock_spec;
 
 const struct gpio_dt_spec *thingy53_led_get_red(void) {
-  return mock_thingy53_led_get_red;
+  return mock_thingy53_led_red_spec;
 }
 
 const struct gpio_dt_spec *thingy53_led_get_green(void) {
-  return mock_thingy53_led_get_green;
+  return mock_thingy53_led_green_spec;
 }
 
 const struct gpio_dt_spec *thingy53_led_get_blue(void) {
-  return mock_thingy53_led_get_blue;
+  return mock_thingy53_led_blue_spec;
 }
