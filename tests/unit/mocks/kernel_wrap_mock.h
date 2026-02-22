@@ -16,8 +16,8 @@ typedef void (*kernel_work_handler_t)(struct k_work *work);
 extern "C" {
 #endif
 
-extern int mock_kernel_wrap_sem_take_return_value;
-extern int mock_kernel_wrap_sem_take_call_count;
+extern int mock_kernel_wrap_sem_take_forever_return_value;
+extern int mock_kernel_wrap_sem_take_forever_call_count;
 extern int mock_kernel_wrap_sem_take_timeout_return_value;
 extern int mock_kernel_wrap_sem_take_timeout_call_count;
 extern int32_t mock_kernel_wrap_sem_take_timeout_last_ms;

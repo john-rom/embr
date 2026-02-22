@@ -12,11 +12,11 @@
 extern "C" {
 #endif
 
-extern thingy53_led_color_t mock_thingy53_led_toggle_last_color;
-extern int mock_thingy53_led_toggle_call_count;
-extern int mock_thingy53_led_toggle_return_value;
-extern int mock_thingy53_led_init_call_count;
-extern int mock_thingy53_led_init_return_value;
+extern thingy53_led_color_t mock_thingy53_led_toggle_impl_last_color;
+extern int mock_thingy53_led_toggle_impl_call_count;
+extern int mock_thingy53_led_toggle_impl_return_value;
+extern int mock_thingy53_led_init_impl_call_count;
+extern int mock_thingy53_led_init_impl_return_value;
 
 void thingy53_led_impl_mock_reset(void);
 

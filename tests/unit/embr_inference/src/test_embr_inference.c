@@ -41,7 +41,7 @@ ZTEST(embr_inference,
   int ret = embr_inference_begin_audio_capture_after_wos();
   zassert_equal(ret, 0,
                 "embr_inference_begin_audio_capture_after_wos should return 0");
-  zassert_equal(mock_kernel_wrap_sem_take_call_count, 1,
+  zassert_equal(mock_kernel_wrap_sem_take_forever_call_count, 1,
                 "kernel_wrap_sem_take_forever should be called once");
   zassert_equal(mock_thingy53_mic_start_call_count, 1,
                 "thingy53_mic_start should be called once");
@@ -51,12 +51,12 @@ ZTEST(embr_inference,
 
 ZTEST(embr_inference,
       test_begin_audio_capture_after_wos_wos_sem_fail_returns_error_on_fail) {
-  mock_kernel_wrap_sem_take_return_value = -EAGAIN;
+  mock_kernel_wrap_sem_take_forever_return_value = -EAGAIN;
 
   int ret = embr_inference_begin_audio_capture_after_wos();
   zassert_equal(ret, -EAGAIN,
                 "embr_inference_begin_audio_capture_after_wos should return -EAGAIN");
-  zassert_equal(mock_kernel_wrap_sem_take_call_count, 1,
+  zassert_equal(mock_kernel_wrap_sem_take_forever_call_count, 1,
                 "kernel_wrap_sem_take_forever should be called once");
   zassert_equal(mock_embr_app_led_toggle_on_capture_start_call_count, 0,
                 "embr_app_led_toggle_on_capture_start should not be called");
