@@ -3,6 +3,17 @@ name: Unit Tests
 on:
   workflow_dispatch:
   push:
+    paths:
+      - '.github/workflows/**'
+      - 'app/**'
+      - 'boards/**'
+      - 'platform/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'third_party/**'
+      - 'CMakeLists.txt'
+      - 'prj.conf'
+      - '*.conf'
 
 jobs:
   test:
