@@ -2,6 +2,7 @@
 ## Edge AI Voice Control for Thread Smart Lighting
 
 [![Unit Tests](https://github.com/john-rom/ember/actions/workflows/run-unit-tests.yaml/badge.svg)](https://github.com/john-rom/ember/actions/workflows/run-unit-tests.yaml)
+[![Build](https://github.com/john-rom/embr/actions/workflows/run-build.yaml/badge.svg)](https://github.com/john-rom/embr/actions/workflows/run-build.yaml)
 [![License: View Only](https://img.shields.io/badge/License-Review%20Only-lightgrey)](LICENSE)
 
 <p align="center">
