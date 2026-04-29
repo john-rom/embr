@@ -16,6 +16,8 @@ jobs:
       - name: Build firmware in nrf_2.4.0 Docker container
         run: |
           docker run --rm \
+          -e GITHUB_RUN_ID \
+          -e GITHUB_RUN_ATTEMPT \
           -v "$GITHUB_WORKSPACE:/workspace" \
           -w /workspace \
           nrf_2.4.0:2.4.0 \
