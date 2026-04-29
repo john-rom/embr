@@ -19,5 +19,6 @@ jobs:
           bash -lc '
             set -euo pipefail
             source /ncs/zephyr/zephyr-env.sh
-            west twister -T tests/unit -O /tmp/twister-out
+            west twister -T tests/unit \
+              -O /tmp/twister-out-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}
           '
