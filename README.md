@@ -22,23 +22,24 @@ connect with an entire set of drop-in AI modules to support autonomous, intellig
   ### Implemented
   - Core board bring-up, logging, and platform wrappers (GPIO/LED/mic)
   - WOS-triggered DMIC capture window + mic lifecycle controls (start/stop/reset/deinit)
-  - Unit tests (Twister/Ztest), CI, and basic Doxygen docs
+  - Edge Impulse wrapper integration with public stub backend and local real-model override
+  - Inference capture pipeline + classification label mapping + command selection
+  - Unit tests (Twister/Ztest), CI, and focused coverage for platform/inference/logic layers
   - PPK2 power baselines (blinky, DMIC continuous capture, DMIC WOS events)
   - WOS capture window validation, via power profiling
 
   ### Next
-  - Edge Impulse wrapper with local model integration + stubbing for CI
+  - Thread networking integration for command transport
+  - CoAP client path for transmitting inferred commands
+  - NFC-assisted or otherwise streamlined Thread commissioning/provisioning
+  - App-level integration testing of the Zephyr runtime shell (`embr_app`)
 
   ### Planned
-  - Application-level modules: inference + command mapping
-  - Minimal inference pipeline evaluation:
-      - voice command → DMIC → EI inference → lighting command → on-board LED
   - Track resource metrics, telemetry, and performance benchmarking
-  - Thread networking integration with CoAP client messaging
   - Companion translator node (separate device/firmware; developed concurrently):
       - CoAP server endpoint → Matter cluster commands
   - End-to-end system demo:
-      - voice command → Matter/Thread smart bulb control (wireless)
+      - voice command → on-device inference → Thread/CoAP message → Matter/Thread smart bulb control
 
 ## Motivation
 Voice control for lighting should feel intuitive, instant, and dependable. Relying on cloud services, Wi-Fi stability, or a vendor mobile 
@@ -46,8 +47,9 @@ app adds latency, fragility, and inconvenience to something that should "just wo
 on-device keyword detection paired with Thread-native control paths. An Edge AI-powered core and a clean boundary to Matter-enabled 
 devices allows for fast, private control that remains interoperable as the system expands.
 
-This repository is an incremental migration from a working prototype into a clean, testable codebase. The current public baseline focuses on bring-up, 
-platform seams, and unit tests; additional modules and the end-to-end voice pipeline will land here as they are refactored and integrated.
+This repository is an incremental migration from a working prototype into a clean, testable codebase. The current public baseline includes bring-up,
+platform seams, a local inference pipeline with a public stub/default build path, and focused unit coverage across key platform and app modules;
+additional integration work and the full end-to-end system path will land here as they are refactored and integrated.
 
 ## Repository layout
 - `.github/workflows/` → CI workflows
@@ -77,6 +79,40 @@ From the project root directory:
 west build -p always -b thingy53_nrf5340_cpuapp
 ```
 This will do a pristine build for the Thingy:53 target board (assuming a secure deployment environment).
+
+### Edge Impulse Build Modes
+The default/public build uses a stub `ei_wrap` backend and does not require
+private Edge Impulse deployment files.
+
+To enable the real Edge Impulse-backed build locally, create a
+`prj.local.conf` file at the repo root with:
+
+```conf
+CONFIG_EDGE_IMPULSE=y
+CONFIG_EDGE_IMPULSE_URI="third_party/edge_impulse/embr"
+CONFIG_EI_WRAPPER_DATA_BUF_SIZE=32001
+```
+
+`prj.local.conf` is gitignored and intended for local/private overrides only.
+You must also provide the corresponding Edge Impulse deployment files locally
+under the configured URI path.
+
+Build the real Edge Impulse-backed local configuration with:
+
+```text
+west build -p always -b thingy53_nrf5340_cpuapp -- -DEXTRA_CONF_FILE=prj.local.conf
+```
+
+When `CONFIG_EDGE_IMPULSE` is not enabled, the firmware builds and runs with a
+deterministic stub inference backend that emits an `unknown` result.
+
+### Edge Impulse Model Compatibility
+The default/public build uses a stub inference backend. If you want to replace
+it with a real Edge Impulse deployment, your local model must match the app's
+label and timing contract.
+
+See [docs/edge_impulse.md](docs/edge_impulse.md) for the required labels and
+audio/inference parameters.
 
 ### Flash
 Connect the Thingy:53 to the Nordic DK's J-Link DEBUG OUT header using a 10-pin, 2x5 1.27 mm IDC (SWD) ribbon cable.
@@ -121,8 +157,8 @@ Full measurement notes and screenshots: [docs/power.md](docs/power.md)
 ## Software Stack
 - **Language**: C
 - **Firmware base**: Zephyr RTOS (via nRF Connect SDK v2.4.0)
-- **Voice pipeline (in progress)**: DMIC/PDM audio capture → buffering/feature extraction → command mapping
-- **On-device inference (planned)**: Edge Impulse runtime integration (keyword model) behind a thin wrapper layer (CI-stubbable)
+- **Voice pipeline**: DMIC/PDM audio capture → buffering → on-device inference → command mapping
+- **On-device inference**: Edge Impulse integration behind a thin wrapper with a public stub/default backend and local real-model override
 - **Networking (planned)**: Thread via OpenThread + CoAP messaging for local control paths
 - **Matter boundary**: Integrates with **harth** (Thread-side messages translated to Matter cluster operations)
 
@@ -177,5 +213,7 @@ Full measurement notes and screenshots: [docs/power.md](docs/power.md)
 - **Docker**: pinned, reproducible toolchain environment (NCS v2.4.0 + Zephyr)
 
 ## Model Artifacts
-This repository will not include model artifacts, as the intent is simply to keep the public repo buildable for review, platform work, 
-tests, and system integration.
+This repository does not include private Edge Impulse model artifacts. The
+public/default build remains usable through a stub inference backend, while
+local real-model builds are enabled separately through `prj.local.conf` and a
+local Edge Impulse deployment.

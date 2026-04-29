@@ -1,10 +1,30 @@
 #include <errno.h>
 #include <stdint.h>
+#include <string.h>
 #include <zephyr/ztest.h>
 
 #include "embr_app_logic.h"
 
 ZTEST_SUITE(embr_app_logic, NULL, NULL, NULL, NULL, NULL);
+
+ZTEST(embr_app_logic, test_state_to_str_known_states_success) {
+  zassert_equal(strcmp(embr_app_state_to_str(STATE_WAIT_WOS), "WAIT_WOS"), 0,
+                "STATE_WAIT_WOS should map to WAIT_WOS");
+  zassert_equal(
+      strcmp(embr_app_state_to_str(STATE_CAPTURE_SLICE), "CAPTURE_SLICE"), 0,
+      "STATE_CAPTURE_SLICE should map to CAPTURE_SLICE");
+  zassert_equal(
+      strcmp(embr_app_state_to_str(STATE_WINDOW_CHECK), "WINDOW_CHECK"), 0,
+      "STATE_WINDOW_CHECK should map to WINDOW_CHECK");
+  zassert_equal(strcmp(embr_app_state_to_str(STATE_RECOVER), "RECOVER"), 0,
+                "STATE_RECOVER should map to RECOVER");
+}
+
+ZTEST(embr_app_logic, test_state_to_str_invalid_state_returns_invalid_success) {
+  zassert_equal(
+      strcmp(embr_app_state_to_str((enum embr_app_state)99), "INVALID"), 0,
+      "invalid state should map to INVALID");
+}
 
 ZTEST(embr_app_logic,
       test_next_state_from_capture_slice_zero_returns_window_check_success) {
@@ -14,39 +34,39 @@ ZTEST(embr_app_logic,
       embr_app_next_state_from_capture_slice(0, &pdm_timeout_count, 3);
 
   zassert_equal(transition.next_state, STATE_WINDOW_CHECK,
-                "next state should be STATE_WINDOW_CHECK");
-  zassert_equal(transition.err, 0, "err should be 0");
-  zassert_equal(pdm_timeout_count, 0,
-                "pdm_timeout_count should remain unchanged");
+                "transition should move to STATE_WINDOW_CHECK");
+  zassert_equal(transition.err, 0, "transition err should remain 0");
+  zassert_equal(pdm_timeout_count, 0, "timeout count should remain unchanged");
 }
 
-ZTEST(embr_app_logic,
-      test_next_state_from_capture_slice_timeout_below_threshold_returns_recover_success) {
+ZTEST(
+    embr_app_logic,
+    test_next_state_from_capture_slice_timeout_below_threshold_returns_recover_success) {
   uint8_t pdm_timeout_count = 0;
 
   struct embr_app_transition transition =
       embr_app_next_state_from_capture_slice(-ETIMEDOUT, &pdm_timeout_count, 3);
 
   zassert_equal(transition.next_state, STATE_RECOVER,
-                "next state should be STATE_RECOVER");
-  zassert_equal(transition.err, 0, "err should be 0");
-  zassert_equal(pdm_timeout_count, 1,
-                "pdm_timeout_count should increment to 1");
+                "transition should move to STATE_RECOVER");
+  zassert_equal(transition.err, 0, "transition err should remain 0");
+  zassert_equal(pdm_timeout_count, 1, "timeout count should increment to 1");
 }
 
-ZTEST(embr_app_logic,
-      test_next_state_from_capture_slice_timeout_at_threshold_returns_error_fail) {
+ZTEST(
+    embr_app_logic,
+    test_next_state_from_capture_slice_timeout_at_threshold_returns_error_fail) {
   uint8_t pdm_timeout_count = 2;
 
   struct embr_app_transition transition =
       embr_app_next_state_from_capture_slice(-ETIMEDOUT, &pdm_timeout_count, 3);
 
   zassert_equal(transition.next_state, STATE_CAPTURE_SLICE,
-                "next state should remain STATE_CAPTURE_SLICE");
+                "transition should remain STATE_CAPTURE_SLICE");
   zassert_equal(transition.err, -ETIMEDOUT,
-                "err should be -ETIMEDOUT at threshold");
+                "transition err should be -ETIMEDOUT");
   zassert_equal(pdm_timeout_count, 3,
-                "pdm_timeout_count should increment at threshold");
+                "timeout count should increment at threshold");
 }
 
 ZTEST(embr_app_logic,
@@ -57,20 +77,20 @@ ZTEST(embr_app_logic,
       embr_app_next_state_from_capture_slice(-EIO, &pdm_timeout_count, 3);
 
   zassert_equal(transition.next_state, STATE_CAPTURE_SLICE,
-                "next state should remain STATE_CAPTURE_SLICE");
-  zassert_equal(transition.err, -EIO, "err should propagate -EIO");
-  zassert_equal(pdm_timeout_count, 0,
-                "pdm_timeout_count should remain unchanged");
+                "transition should remain STATE_CAPTURE_SLICE");
+  zassert_equal(transition.err, -EIO, "transition err should propagate -EIO");
+  zassert_equal(pdm_timeout_count, 0, "timeout count should remain unchanged");
 }
 
-ZTEST(embr_app_logic,
-      test_next_state_from_capture_slice_null_timeout_count_returns_einval_fail) {
+ZTEST(
+    embr_app_logic,
+    test_next_state_from_capture_slice_null_timeout_count_returns_einval_fail) {
   struct embr_app_transition transition =
       embr_app_next_state_from_capture_slice(0, NULL, 3);
 
   zassert_equal(transition.next_state, STATE_CAPTURE_SLICE,
-                "next state should default to STATE_CAPTURE_SLICE");
-  zassert_equal(transition.err, -EINVAL, "err should be -EINVAL");
+                "transition should remain STATE_CAPTURE_SLICE");
+  zassert_equal(transition.err, -EINVAL, "transition err should be -EINVAL");
 }
 
 ZTEST(embr_app_logic,
@@ -79,8 +99,8 @@ ZTEST(embr_app_logic,
       embr_app_next_state_from_window_check(-EIO);
 
   zassert_equal(transition.next_state, STATE_WINDOW_CHECK,
-                "next state should remain STATE_WINDOW_CHECK");
-  zassert_equal(transition.err, -EIO, "err should propagate -EIO");
+                "transition should remain STATE_WINDOW_CHECK");
+  zassert_equal(transition.err, -EIO, "transition err should propagate -EIO");
 }
 
 ZTEST(embr_app_logic,
@@ -89,8 +109,8 @@ ZTEST(embr_app_logic,
       embr_app_next_state_from_window_check(0);
 
   zassert_equal(transition.next_state, STATE_CAPTURE_SLICE,
-                "next state should be STATE_CAPTURE_SLICE");
-  zassert_equal(transition.err, 0, "err should be 0");
+                "transition should move to STATE_CAPTURE_SLICE");
+  zassert_equal(transition.err, 0, "transition err should remain 0");
 }
 
 ZTEST(embr_app_logic,
@@ -99,6 +119,6 @@ ZTEST(embr_app_logic,
       embr_app_next_state_from_window_check(1);
 
   zassert_equal(transition.next_state, STATE_WAIT_WOS,
-                "next state should be STATE_WAIT_WOS");
-  zassert_equal(transition.err, 0, "err should be 0");
+                "transition should move to STATE_WAIT_WOS");
+  zassert_equal(transition.err, 0, "transition err should remain 0");
 }

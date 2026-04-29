@@ -20,7 +20,7 @@ static struct kernel_wrap_work error_work_item;
 static bool error_work_initialized;
 static kernel_work_handler_t error_work_handler;
 
-int kernel_wrap_work_init(kernel_work_handler_t handler) {
+int kernel_wrap_error_work_init(kernel_work_handler_t handler) {
   if (!handler) {
     return -EINVAL;
   }
@@ -38,7 +38,7 @@ int kernel_wrap_work_init(kernel_work_handler_t handler) {
   return 0;
 }
 
-int kernel_wrap_work_submit(void) {
+int kernel_wrap_error_work_submit(void) {
   if (!error_work_initialized) {
     return -ENODEV;
   }

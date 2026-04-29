@@ -25,9 +25,9 @@ typedef struct embr_classification_results {
 
 /** Aggregated per-label scores for a full inference window. */
 typedef struct embr_label_scores {
-  float ember_glow;
-  float ember_sleep;
-  float ember_flip;
+  float embr_glow;
+  float embr_sleep;
+  float embr_flip;
   float unknown;
   float noise;
 } embr_label_scores;

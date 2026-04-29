@@ -19,7 +19,7 @@ application layers without blocking.
 
 ## Reporting Flow
 
-1. **Report**: A driver or callback calls `embr_error_report(ERROR_ID)`.
+1. **Report**: A driver or callback calls `embr_error_report(EMBR_ERR_ID_*)`.
 2. **Defer**: The module sets a pending bit and schedules work.
 3. **Handle**: The work handler iterates all pending IDs.
 4. **App policy**: The registered app handler logs and can later add counters,
@@ -43,17 +43,20 @@ avoids duplicated switch logic in the app.
 
 ## Runtime Details
 
-- The deferred transport uses one global work item via `kernel_wrap_work_*`.
-- `embr_error_report()` initializes that work item lazily on first use.
-- Work submission is retried up to 3 times; repeated submission failure drops
-  pending bits to avoid stale replay.
+- The deferred transport uses one global work item via `kernel_wrap_error_work_*`.
+- `embr_error_report()` attempts lazy initialization on the reporting path; the
+  wrapper makes repeated initialization calls idempotent once the global work
+  item is set up.
+- Work submission is attempted up to 3 times total per scheduling episode; if
+  all submit attempts fail, pending bits are dropped to avoid stale replay.
 - Internal diagnostics are available through `embr_error_get_stats()`:
   `work_init_fail_count` and `work_submit_fail_count` (both saturating `uint8_t`).
 
 ## Notes
 
 - Repeated IDs are coalesced per work cycle to avoid log floods.
-- Reporting is safe for ISR/high-priority callbacks because it only sets bits
-  and attempts deferred submission.
+- Reporting is intended for ISR/high-priority callbacks: it sets a pending bit
+  and attempts deferred work submission, while deferring handler execution to
+  workqueue context.
 - If no handler is registered, deferred IDs are dropped (no logging). This does
   not affect direct synchronous app-layer logging.

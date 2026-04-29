@@ -7,6 +7,7 @@
  */
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 struct gpio_dt_spec {
@@ -17,9 +18,11 @@ struct gpio_dt_spec {
 extern "C" {
 #endif
 
+extern const struct gpio_dt_spec *mock_gpio_wrap_pin_toggle_last_spec;
 extern bool mock_gpio_wrap_is_ready_ret;
 extern int mock_gpio_wrap_pin_configure_ret;
 extern int mock_gpio_wrap_pin_toggle_ret;
+extern int mock_gpio_wrap_pin_toggle_call_count;
 
 void gpio_wrap_mock_reset(void);
 

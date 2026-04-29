@@ -41,8 +41,8 @@ ZTEST(embr_error_id, test_error_report_invokes_handler_success) {
                 "embr_error_report should invoke handler once");
   zassert_equal(last_id, EMBR_ERR_ID_PDM_OVERFLOW,
                 "handler should receive PDM_OVERFLOW");
-  zassert_equal(mock_kernel_wrap_work_submit_call_count, 1,
-                "kernel_wrap_work_submit should be called once");
+  zassert_equal(mock_kernel_wrap_error_work_submit_call_count, 1,
+                "kernel_wrap_error_work_submit should be called once");
 }
 
 ZTEST(embr_error_id, test_error_report_coalesces_ids_success) {
@@ -67,21 +67,23 @@ ZTEST(embr_error_id, test_error_report_coalesces_ids_success) {
                 "distinct error IDs should be reported separately");
 }
 
-ZTEST(embr_error_id,
-      test_error_report_submit_fail_then_retry_resubmits_and_invokes_handler_success) {
-  mock_kernel_wrap_work_submit_return_value = -EIO;
+ZTEST(
+    embr_error_id,
+    test_error_report_submit_fail_then_retry_resubmits_and_invokes_handler_success) {
+  mock_kernel_wrap_error_work_submit_return_value = -EIO;
 
   embr_error_report(EMBR_ERR_ID_PDM_OVERFLOW);
-  zassert_equal(mock_kernel_wrap_work_submit_call_count, 3,
+  zassert_equal(mock_kernel_wrap_error_work_submit_call_count, 3,
                 "first submit should be attempted up to retry limit");
   zassert_equal(handler_call_count, 0,
                 "handler should not run when submit fails");
 
-  mock_kernel_wrap_work_submit_return_value = 0;
+  mock_kernel_wrap_error_work_submit_return_value = 0;
 
   embr_error_report(EMBR_ERR_ID_PDM_OVERFLOW);
-  zassert_equal(mock_kernel_wrap_work_submit_call_count, 4,
-                "second submit should be attempted after previous submit failure");
+  zassert_equal(
+      mock_kernel_wrap_error_work_submit_call_count, 4,
+      "second submit should be attempted after previous submit failure");
 
   kernel_wrap_mock_run_last_work();
 
@@ -91,14 +93,15 @@ ZTEST(embr_error_id,
                 "handler should receive PDM_OVERFLOW");
 }
 
-ZTEST(embr_error_id, test_error_stats_counts_init_fail_and_submit_fail_success) {
+ZTEST(embr_error_id,
+      test_error_stats_counts_init_fail_and_submit_fail_success) {
   struct embr_error_stats stats = {0};
 
-  mock_kernel_wrap_work_init_return_value = -EIO;
+  mock_kernel_wrap_error_work_init_return_value = -EIO;
   embr_error_report(EMBR_ERR_ID_PDM_OVERFLOW);
 
-  mock_kernel_wrap_work_init_return_value = 0;
-  mock_kernel_wrap_work_submit_return_value = -EIO;
+  mock_kernel_wrap_error_work_init_return_value = 0;
+  mock_kernel_wrap_error_work_submit_return_value = -EIO;
   embr_error_report(EMBR_ERR_ID_PDM_OVERFLOW);
 
   embr_error_get_stats(&stats);
@@ -112,7 +115,7 @@ ZTEST(embr_error_id, test_error_stats_counts_init_fail_and_submit_fail_success) 
 ZTEST(embr_error_id, test_error_stats_reset_clears_counts_success) {
   struct embr_error_stats stats = {0};
 
-  mock_kernel_wrap_work_submit_return_value = -EIO;
+  mock_kernel_wrap_error_work_submit_return_value = -EIO;
   embr_error_report(EMBR_ERR_ID_PDM_OVERFLOW);
 
   embr_error_reset_stats();
@@ -124,10 +127,11 @@ ZTEST(embr_error_id, test_error_stats_reset_clears_counts_success) {
                 "work_submit_fail_count should be 0 after reset");
 }
 
-ZTEST(embr_error_id, test_error_stats_submit_fail_count_saturates_at_u8_max_success) {
+ZTEST(embr_error_id,
+      test_error_stats_submit_fail_count_saturates_at_u8_max_success) {
   struct embr_error_stats stats = {0};
 
-  mock_kernel_wrap_work_submit_return_value = -EIO;
+  mock_kernel_wrap_error_work_submit_return_value = -EIO;
 
   for (int i = 0; i < 100; i++) {
     embr_error_report(EMBR_ERR_ID_PDM_OVERFLOW);

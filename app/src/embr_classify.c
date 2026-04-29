@@ -23,12 +23,12 @@ embr_classify_assign_label_scores(const embr_classification_results *results,
     return -EINVAL;
   }
 
-  if (!strcmp(results->label, "ember_glow")) {
-    scores->ember_glow = results->probability;
-  } else if (!strcmp(results->label, "ember_sleep")) {
-    scores->ember_sleep = results->probability;
-  } else if (!strcmp(results->label, "ember_flip")) {
-    scores->ember_flip = results->probability;
+  if (!strcmp(results->label, "embr_glow")) {
+    scores->embr_glow = results->probability;
+  } else if (!strcmp(results->label, "embr_sleep")) {
+    scores->embr_sleep = results->probability;
+  } else if (!strcmp(results->label, "embr_flip")) {
+    scores->embr_flip = results->probability;
   } else if (!strcmp(results->label, "unknown")) {
     scores->unknown = results->probability;
   } else if (!strcmp(results->label, "noise")) {
@@ -69,34 +69,36 @@ int embr_classify_set_command(embr_label_scores scores, embr_command *command) {
     return -EINVAL;
   }
 
-  if (scores.ember_glow > scores.ember_sleep &&
-      scores.ember_glow > scores.ember_flip &&
-      scores.ember_glow > scores.unknown && scores.ember_glow > scores.noise) {
-    *command = EMBR_GLOW;
-  } else if (scores.ember_sleep > scores.ember_glow &&
-             scores.ember_sleep > scores.ember_flip &&
-             scores.ember_sleep > scores.unknown &&
-             scores.ember_sleep > scores.noise) {
-    *command = EMBR_SLEEP;
-  } else if (scores.ember_flip > scores.ember_glow &&
-             scores.ember_flip > scores.ember_sleep &&
-             scores.ember_flip > scores.unknown &&
-             scores.ember_flip > scores.noise) {
-    *command = EMBR_FLIP;
-  } else if (scores.unknown > scores.ember_glow &&
-             scores.unknown > scores.ember_sleep &&
-             scores.unknown > scores.ember_flip &&
-             scores.unknown > scores.noise) {
-    *command = UNKNOWN;
-  } else if (scores.noise > scores.ember_glow &&
-             scores.noise > scores.ember_sleep &&
-             scores.noise > scores.ember_flip &&
-             scores.noise > scores.unknown) {
-    *command = NOISE;
-  } else {
-    *command = UNKNOWN;
+  struct score_candidate {
+    float score;
+    embr_command command;
+  };
+  const struct score_candidate candidates[] = {
+      {scores.embr_glow, EMBR_GLOW}, {scores.embr_sleep, EMBR_SLEEP},
+      {scores.embr_flip, EMBR_FLIP}, {scores.unknown, UNKNOWN},
+      {scores.noise, NOISE},
+  };
+  float best_score = scores.unknown;
+  embr_command best_command = UNKNOWN;
+  bool has_tie_for_best = false;
+  size_t i;
+
+  for (i = 0; i < ARRAY_SIZE(candidates); i++) {
+    if (candidates[i].score > best_score) {
+      best_score = candidates[i].score;
+      best_command = candidates[i].command;
+      has_tie_for_best = false;
+    } else if (candidates[i].command != UNKNOWN &&
+               candidates[i].score == best_score) {
+      has_tie_for_best = true;
+    }
   }
 
+  if (has_tie_for_best) {
+    *command = UNKNOWN;
+  } else {
+    *command = best_command;
+  }
   return 0;
 }
 

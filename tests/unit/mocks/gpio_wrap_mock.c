@@ -1,13 +1,17 @@
 #include "gpio_wrap_mock.h"
 
+const struct gpio_dt_spec *mock_gpio_wrap_pin_toggle_last_spec = NULL;
 bool mock_gpio_wrap_is_ready_ret = false;
 int mock_gpio_wrap_pin_configure_ret = 0;
 int mock_gpio_wrap_pin_toggle_ret = 0;
+int mock_gpio_wrap_pin_toggle_call_count = 0;
 
 void gpio_wrap_mock_reset(void) {
   mock_gpio_wrap_is_ready_ret = false;
   mock_gpio_wrap_pin_configure_ret = 0;
   mock_gpio_wrap_pin_toggle_ret = 0;
+  mock_gpio_wrap_pin_toggle_call_count = 0;
+  mock_gpio_wrap_pin_toggle_last_spec = NULL;
 }
 
 bool gpio_wrap_is_ready_dt(const struct gpio_dt_spec *spec) {
@@ -22,6 +26,7 @@ int gpio_wrap_pin_configure_dt_output_inactive(
 }
 
 int gpio_wrap_pin_toggle_dt(const struct gpio_dt_spec *spec) {
-  (void)spec;
+  mock_gpio_wrap_pin_toggle_last_spec = spec;
+  mock_gpio_wrap_pin_toggle_call_count++;
   return mock_gpio_wrap_pin_toggle_ret;
 }

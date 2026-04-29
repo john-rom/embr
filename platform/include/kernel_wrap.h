@@ -45,14 +45,14 @@ int kernel_wrap_sem_take_timeout_ms(struct k_sem *sem, int32_t timeout_ms);
  * @return 0 on success, -EALREADY if a different handler is already set,
  *         or -errno on failure
  */
-int kernel_wrap_work_init(kernel_work_handler_t handler);
+int kernel_wrap_error_work_init(kernel_work_handler_t handler);
 
 /**
  * @brief Submit the global deferred-error work item.
  *
  * @return 0 on success, or -errno on failure
  */
-int kernel_wrap_work_submit(void);
+int kernel_wrap_error_work_submit(void);
 
 #ifdef __cplusplus
 }

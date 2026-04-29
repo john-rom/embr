@@ -33,7 +33,7 @@ static void increment_work_fail_counter(atomic_t *counter) {
 static void submit_work_with_retry(void) {
   for (int attempt = 0; attempt < EMBR_ERROR_WORK_SUBMIT_RETRY_LIMIT;
        attempt++) {
-    int err = kernel_wrap_work_submit();
+    int err = kernel_wrap_error_work_submit();
     if (!err) {
       return;
     }
@@ -102,7 +102,7 @@ void embr_error_report(embr_error_id_t id) {
     return;
   }
 
-  int err = kernel_wrap_work_init(embr_error_work_handler);
+  int err = kernel_wrap_error_work_init(embr_error_work_handler);
   if (err) {
     increment_work_fail_counter(&work_init_fail_count);
     return;
