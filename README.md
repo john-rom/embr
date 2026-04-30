@@ -145,11 +145,16 @@ Baseline power measurements were captured on a Nordic Thingy:53 using the Nordic
 
 | Profile | Avg Current | Peak Current | Notes |
 |---|---:|---:|---|
-| LED Blink Baseline | 10.46 µA | 13.60 mA | Mean of 3 trials (steady-state after init settles) |
+| LED Blink Baseline | 10.46 µA | 13.60 mA | Mean of 3 trials; steady-state after init settles |
+| DMIC Continuous Capture | 646.08 µA | 16.70 mA | Mean of 3 trials; 16 kHz mono PDM capture, no sleep/idle |
+| WOS Armed Idle | 101.44 µA | 11.33 mA | Mean of 3 idle trials; 26.85 s windows, no wake events |
+| WOS Wake Event | 673.25 µA | 14.83 mA | Mean of 6 wake selections; ~1.006 s active capture window per wake |
+| WOS + DSP/Inference Armed Idle | 96.24 µA | 12.83 mA | Mean of 3 idle trials; 26.85 s windows, no wake events |
+| WOS + DSP/Inference Event | 1.154 mA | 16.34 mA | Mean of 3 combined event selections; ~1.175 s capture + DSP/inference window |
 
 <figure>
-  <img src="docs/assets/power/ppk_blinky_steady_1.png" width="1200" alt="PPK2 steady-state blinky capture (Trial 1)">
-  <figcaption><em>PPK2 capture showing steady-state LED blink current after init settles (selection window).</em></figcaption>
+  <img src="docs/assets/power/embr_wos_inference_ev1_inference.png" width="1200" alt="DSP/Inference event (selected region) showing ~176 ms active DSP/inference window">
+  <figcaption><em>DSP/Inference event (selected region) showing ~176 ms active DSP/inference window.</em></figcaption>
 </figure>
 <p></p>
 
