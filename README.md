@@ -1,7 +1,7 @@
 # embr
 ## Edge AI Voice Control for Thread Smart Lighting
 
-[![Unit Tests](https://github.com/john-rom/ember/actions/workflows/run-unit-tests.yaml/badge.svg)](https://github.com/john-rom/ember/actions/workflows/run-unit-tests.yaml)
+[![Unit Tests](https://github.com/john-rom/embr/actions/workflows/run-unit-tests.yaml/badge.svg)](https://github.com/john-rom/embr/actions/workflows/run-unit-tests.yaml)
 [![Build](https://github.com/john-rom/embr/actions/workflows/run-build.yaml/badge.svg)](https://github.com/john-rom/embr/actions/workflows/run-build.yaml)
 [![License: View Only](https://img.shields.io/badge/License-Review%20Only-lightgrey)](LICENSE)
 
@@ -25,13 +25,15 @@ connect with an entire set of drop-in AI modules to support autonomous, intellig
   - WOS-triggered DMIC capture window + mic lifecycle controls (start/stop/reset/deinit)
   - Edge Impulse wrapper integration with public stub backend and local real-model override
   - Inference capture pipeline + classification label mapping + command selection
-  - Unit tests (Twister/Ztest), CI, and focused coverage for platform/inference/logic layers
-  - PPK2 power baselines (blinky, DMIC continuous capture, DMIC WOS events)
-  - WOS capture window validation, via power profiling
+  - Thread networking transport via OpenThread as a sleepy minimal end device
+    (MTD/SED), sending multicast CoAP light commands
+  - Platform wrapper for NCS OpenThread and socket-based CoAP APIs
+  - Unit tests (Twister/Ztest), CI, and focused coverage for platform/inference/logic/transport layers
+  - PPK2 power baselines (blinky, DMIC continuous capture, DMIC WOS events, WOS + DSP/inference)
+  - WOS capture window + DSP/inference validation, via power profiling
 
   ### Next
-  - Thread networking integration for command transport
-  - CoAP client path for transmitting inferred commands
+  - Thread/SED idle and event power profiling
   - NFC-assisted or otherwise streamlined Thread commissioning/provisioning
   - App-level integration testing of the Zephyr runtime shell (`embr_app`)
 
@@ -39,7 +41,7 @@ connect with an entire set of drop-in AI modules to support autonomous, intellig
   - Track resource metrics, telemetry, and performance benchmarking
   - Companion translator node (separate device/firmware; developed concurrently):
       - CoAP server endpoint → Matter cluster commands
-  - End-to-end system demo:
+  - Documented end-to-end system demo:
       - voice command → on-device inference → Thread/CoAP message → Matter/Thread smart bulb control
 
 ## Motivation
@@ -81,12 +83,15 @@ west build -p always -b thingy53_nrf5340_cpuapp
 ```
 This will do a pristine build for the Thingy:53 target board (assuming a secure deployment environment).
 
-### Edge Impulse Build Modes
+### Local Build Configuration
+`prj.local.conf` is gitignored and intended for local/private overrides only.
+
+#### Edge Impulse Backend
 The default/public build uses a stub `ei_wrap` backend and does not require
 private Edge Impulse deployment files.
 
-To enable the real Edge Impulse-backed build locally, create a
-`prj.local.conf` file at the repo root with:
+To enable the real Edge Impulse-backed build locally, add the following
+configuration to `prj.local.conf` at the repo root:
 
 ```conf
 CONFIG_EDGE_IMPULSE=y
@@ -94,18 +99,49 @@ CONFIG_EDGE_IMPULSE_URI="third_party/edge_impulse/embr"
 CONFIG_EI_WRAPPER_DATA_BUF_SIZE=32001
 ```
 
-`prj.local.conf` is gitignored and intended for local/private overrides only.
 You must also provide the corresponding Edge Impulse deployment files locally
 under the configured URI path.
 
-Build the real Edge Impulse-backed local configuration with:
+When `CONFIG_EDGE_IMPULSE` is not enabled, the firmware builds and runs with a
+deterministic stub inference backend that emits an `unknown` result.
+
+#### Thread Device Role
+The firmware is configured as an OpenThread Minimal Thread Device / Sleepy End
+Device (MTD/SED). `embr` is a leaf command source: it sends voice-triggered CoAP
+commands and does not route Thread traffic for other nodes.
+
+The SED role keeps wake-on-sound idle behavior reliable while the Thread stack
+is enabled. With NCS v2.4.0, the default SED poll period resolves to `236000`
+ms; `embr` uses that default because it does not expect application-level
+inbound messages during normal operation.
+
+Thread network credentials remain local in `prj.local.conf`; the tracked
+`prj.conf` owns the product role and stack sizing.
+
+#### Thread Network Dataset
+Local images can be configured to attach to an existing Thread network by
+providing values derived from the OTBR active dataset:
+
+```conf
+CONFIG_OPENTHREAD_NETWORKKEY="<16-byte colon-delimited network key>"
+CONFIG_OPENTHREAD_PANID=<decimal PAN ID>
+CONFIG_OPENTHREAD_CHANNEL=<11-26>
+CONFIG_OPENTHREAD_XPANID="<8-byte colon-delimited extended PAN ID>"
+```
+
+The OTBR CLI prints the Extended PAN ID and network key as contiguous
+hexadecimal characters. Zephyr expects colon-delimited byte strings for these
+options, so insert a colon between each byte pair. The OTBR CLI prints the PAN
+ID in hexadecimal form; convert it to decimal for `CONFIG_OPENTHREAD_PANID`.
+
+Thread dataset values are environment-specific credentials and remain local
+through the gitignored `prj.local.conf` override.
+
+Build an image with local overrides using:
 
 ```text
 west build -p always -b thingy53_nrf5340_cpuapp -- -DEXTRA_CONF_FILE=prj.local.conf
 ```
-
-When `CONFIG_EDGE_IMPULSE` is not enabled, the firmware builds and runs with a
-deterministic stub inference backend that emits an `unknown` result.
 
 ### Edge Impulse Model Compatibility
 The default/public build uses a stub inference backend. If you want to replace
@@ -135,7 +171,7 @@ west twister -T tests/unit
 ## Power Profile
 <p align="center">
 <figure>
-  <img src="docs/assets/power/t53_ppk2.png" width="600" alt="Thingy:53 connected to the PPK2)">
+  <img src="docs/assets/power/t53_ppk2.png" width="600" alt="Thingy:53 connected to the PPK2">
   <figcaption><em>Thingy:53 connected to the PPK2 via the current measurement and debug board.</em></figcaption>
 </figure>
 </p>
@@ -165,7 +201,7 @@ Full measurement notes and screenshots: [docs/power.md](docs/power.md)
 - **Firmware base**: Zephyr RTOS (via nRF Connect SDK v2.4.0)
 - **Voice pipeline**: DMIC/PDM audio capture → buffering → on-device inference → command mapping
 - **On-device inference**: Edge Impulse integration behind a thin wrapper with a public stub/default backend and local real-model override
-- **Networking (planned)**: Thread via OpenThread + CoAP messaging for local control paths
+- **Networking**: Thread via OpenThread + multicast CoAP messaging for local control paths
 - **Matter boundary**: Integrates with **harth** (Thread-side messages translated to Matter cluster operations)
 
 ## Project Hardware

@@ -9,6 +9,7 @@
 #include "embr_classify.h"
 #include "embr_error_id.h"
 #include "embr_inference.h"
+#include "embr_transport.h"
 #include "embr_types.h"
 #include "thingy53_led.h"
 #include "thingy53_mic.h"
@@ -97,10 +98,12 @@ static int embr_app_handle_state_wait_wos(struct embr_app_runtime *runtime) {
   return 0;
 }
 
-static int embr_app_handle_state_capture_slice(struct embr_app_runtime *runtime) {
+static int
+embr_app_handle_state_capture_slice(struct embr_app_runtime *runtime) {
   int err = embr_inference_process_wos_event_audio();
-  struct embr_app_transition transition = embr_app_next_state_from_capture_slice(
-      err, &runtime->pdm_timeout_count, EMBR_PDM_TIMEOUT_REBOOT_THRESHOLD);
+  struct embr_app_transition transition =
+      embr_app_next_state_from_capture_slice(err, &runtime->pdm_timeout_count,
+                                             EMBR_PDM_TIMEOUT_REBOOT_THRESHOLD);
 
   if (err == -ETIMEDOUT && transition.err == 0) {
     LOG_WRN("PDM timeout (%u). Recovering mic...",
@@ -118,7 +121,8 @@ static int embr_app_handle_state_capture_slice(struct embr_app_runtime *runtime)
   return 0;
 }
 
-static int embr_app_handle_state_window_check(struct embr_app_runtime *runtime) {
+static int
+embr_app_handle_state_window_check(struct embr_app_runtime *runtime) {
   int window_check_ret = embr_inference_stop_audio_if_window_full();
   struct embr_app_transition transition =
       embr_app_next_state_from_window_check(window_check_ret);
@@ -178,7 +182,14 @@ static void result_ready_cb(int err) {
     LOG_ERR("Failed to set embr command: %d", err);
     goto restart_prediction;
   }
+
   LOG_INF("Inference result: %s", embr_classify_command_to_str(command));
+
+  err = embr_transport_send_command(command);
+  if (err) {
+    LOG_ERR("Failed to transport embr command: %d", err);
+    goto restart_prediction;
+  }
 
 restart_prediction:
   command = EMBR_RESET;
@@ -218,6 +229,13 @@ int embr_app_init(void) {
   embr_error_register_handler(embr_app_error_handler);
 
   k_work_init(&led_work_toggle.off_work, led_off_work_handler);
+
+  err = embr_transport_init();
+  if (err) {
+    LOG_ERR("embr transport init failed: %d", err);
+    return err;
+  }
+  LOG_INF("embr transport is ready");
 
   app_initialized = true;
 

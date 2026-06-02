@@ -8,6 +8,7 @@ zephyr_library_sources(
   src/kernel_wrap.c
   src/dmic_wrap.c
   src/gpio_wrap.c
+  src/openthread_coap_wrap.c
   src/thingy53_led.c
   src/thingy53_led_impl.c
   src/thingy53_led_specs.c

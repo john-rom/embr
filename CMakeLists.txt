@@ -4,7 +4,7 @@ list(APPEND ZEPHYR_EXTRA_MODULES ${CMAKE_CURRENT_SOURCE_DIR}/third_party/vm3011)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
-project(ember)
+project(embr)
 
 zephyr_include_directories(
   app/include

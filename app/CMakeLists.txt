@@ -10,6 +10,8 @@ zephyr_library_sources(
   src/embr_error_id.c
   src/embr_inference.c
   src/embr_classify.c
+  src/embr_transport.c
+  src/embr_coap_client.c
 )
 
 if(CONFIG_EDGE_IMPULSE)
