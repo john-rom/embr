@@ -16,7 +16,7 @@ Values are intended to provide a repeatable baseline and enable apples-to-apples
 **Measurement mode**: Ammeter mode (target powered through PPK2)  
 **Supply voltage**: 3.12 V (measured at Thingy:53 VIN with DMM; PPK2 VOUT → VIN)  
 **Target hardware**: Nordic Thingy:53  
-**Latest firmware state**: WOS capture + DSP/inference  
+**Latest firmware state**: WOS capture + DSP/inference + Thread-connected CoAP command transmission  
 **Logging**: RTT
 
 **Notes**
@@ -44,10 +44,17 @@ The measurements below currently establish:
   - ~175 ms avg. DSP + inference time
   - Idle preceding/following burst activity
 
+- Thread networking and CoAP command baseline:
+  - OpenThread MTD/SED command-source role
+  - Network-unavailable attach retry behavior (Thread stack up, no network reachable)
+  - Thread-connected idle with WOS + DSP/inference armed
+  - Voice-triggered WOS capture, DSP/inference, and multicast CoAP command transmission in the same event path
+
 Future profiles planned:
-- Thread join + idle
-- Radio TX/RX bursts
-- End-to-end voice-triggered lighting control path
+- Longer-duration Thread/SED connected idle
+- Thread commissioning / join transient
+- Isolated radio TX/RX bursts
+- End-to-end voice-triggered lighting control path through the Matter boundary
 
 ---
 
@@ -61,6 +68,154 @@ Future profiles planned:
   -  Average current and average peak current
   -  Measurements from DMIC bring-up and later also include: min/max, range, standard deviation (std dev), and coefficient of variation (CV)
  
+### ~~~ Thread Networking + CoAP — Attach Retry, Connected Idle, and WOS Command Event ~~~
+**Behavior**
+- Thread stack enabled as an OpenThread MTD/SED command source
+- When no Thread network is available, the device repeatedly attempts to attach instead of reaching the connected idle floor
+- When the Thread network is available, the device attaches, idles with WOS + DSP/inference armed, and sends voice-triggered multicast CoAP light commands
+- WOS command event path: WOS audio capture → DSP/inference → CoAP command transmission → return to Thread-connected idle
+
+**Notes**
+- No-network attach retry trials: 3; 24.80-25.59 s per trial
+- Thread-connected idle trials: 3; 20.01-26.63 s per trial
+- WOS command event samples: 3 events from one longer Thread-connected run
+- Event sub-selections:
+  - WOS audio capture: ~1.003 s average selection window
+  - DSP/inference + CoAP transmission: ~217.8 ms average selection window
+  - Full WOS-to-CoAP command window: ~1.218 s average selection window
+- Full command-window current and charge are taken from the direct PPK2 selection spanning WOS capture through CoAP transmission.
+- The no-network captures are not an idle power floor; they represent repeated Thread attach attempts when no network is reachable.
+- Figures below show one representative screenshot per profiled behavior/sub-selection; all trial screenshots are used for the calculations but are not embedded.
+- PPK2 screenshot readouts are rounded to the displayed precision; derived statistics inherit that precision.
+
+**Thread network unavailable (attach retry)**
+- Average current: 3.97 mA
+  - Min/Max: 3.91 mA / 4.07 mA
+  - Range: 0.16 mA
+  - Std dev (sample): 0.09 mA
+  - CV: 2.26%
+
+- Average peak current (attach-retry bursts): 25.50 mA
+  - Min/Max: 21.86 mA / 28.18 mA
+  - Range: 6.32 mA
+  - Std dev (sample): 3.27 mA
+  - CV: 12.81%
+
+- Average charge per attach-retry window: 100.40 mC
+  - Min/Max: 100.09 mC / 100.93 mC
+  - Range: 0.84 mC
+  - Std dev (sample): 0.46 mC
+  - CV: 0.46%
+
+**Thread-connected idle (WOS + DSP/inference armed)**
+- Average current: 113.98 µA
+  - Min/Max: 113.84 µA / 114.09 µA
+  - Range: 0.25 µA
+  - Std dev (sample): 0.13 µA
+  - CV: 0.11%
+
+- Average peak current (background spikes): 10.22 mA
+  - Min/Max: 8.56 mA / 11.13 mA
+  - Range: 2.57 mA
+  - Std dev (sample): 1.44 mA
+  - CV: 14.11%
+
+**WOS audio capture event (Thread connected)**
+- Average current: 713.67 µA
+  - Min/Max: 708.22 µA / 719.07 µA
+  - Range: 10.85 µA
+  - Std dev (sample): 5.43 µA
+  - CV: 0.76%
+
+- Average peak current: 14.68 mA
+  - Min/Max: 13.98 mA / 15.06 mA
+  - Range: 1.08 mA
+  - Std dev (sample): 0.61 mA
+  - CV: 4.13%
+
+- Average charge per WOS capture: 715.95 µC
+  - Min/Max: 710.84 µC / 720.10 µC
+  - Range: 9.26 µC
+  - Std dev (sample): 4.70 µC
+  - CV: 0.66%
+
+**DSP/inference + CoAP transmission event**
+- Average current: 3.34 mA
+  - Min/Max: 3.28 mA / 3.40 mA
+  - Range: 0.12 mA
+  - Std dev (sample): 0.06 mA
+  - CV: 1.80%
+
+- Average peak current: 13.34 mA
+  - Min/Max: 12.87 mA / 13.91 mA
+  - Range: 1.04 mA
+  - Std dev (sample): 0.53 mA
+  - CV: 3.95%
+
+- Average charge per DSP/inference + CoAP transmission: 726.97 µC
+  - Min/Max: 708.57 µC / 742.19 µC
+  - Range: 33.62 µC
+  - Std dev (sample): 17.04 µC
+  - CV: 2.34%
+
+**Full WOS-to-CoAP command event**
+- Average current: 1.187 mA
+  - Min/Max: 1.18 mA / 1.19 mA
+  - Range: 10.00 µA
+  - Std dev (sample): 5.77 µA
+  - CV: 0.49%
+
+- Average peak current: 14.68 mA
+  - Min/Max: 13.98 mA / 15.06 mA
+  - Range: 1.08 mA
+  - Std dev (sample): 0.61 mA
+  - CV: 4.13%
+
+- Average charge per WOS-to-CoAP command: 1.443 mC
+  - Min/Max: 1.43 mC / 1.45 mC
+  - Range: 20.00 µC
+  - Std dev (sample): 11.55 µC
+  - CV: 0.80%
+
+**Derived comparisons against previous WOS + DSP/inference profile**
+- Thread-connected idle current is 17.74 µA above the previous WOS + DSP/inference armed idle baseline (113.98 µA vs 96.24 µA).
+- Network-unavailable attach retry averages 3.85 mA above Thread-connected idle (~34.8x connected idle current).
+- Full WOS-to-CoAP command charge is ~86.8 µC above the previous WOS + DSP/inference event charge (1.443 mC vs 1.3565 mC), over a direct selection window ~43 ms longer (1.218 s vs ~1.175 s).
+- These deltas include the full Thread-enabled runtime path and are not isolated radio-only TX/RX costs.
+
+**Representative attach-retry capture (Thread network unavailable)**
+<figure>
+  <img src="assets/power/embr_thread_no_network_idle_1.png" width="1200" alt="Thread stack enabled with no Thread network available, attach retry current">
+  <figcaption><em>Representative attach-retry capture with no Thread network available; repeated attach attempts dominate the window.</em></figcaption>
+</figure>
+</p>
+
+**Representative steady-state capture (Thread connected idle)**
+<figure>
+  <img src="assets/power/embr_thread_connected_idle_1.png" width="1200" alt="Thread connected idle with WOS and DSP/inference armed">
+  <figcaption><em>Representative Thread-connected idle capture with WOS + DSP/inference armed.</em></figcaption>
+</figure>
+</p>
+
+**Representative event selections (one screenshot per sub-selection)**
+<figure>
+  <img src="assets/power/embr_thread_wos_capture_1.png" width="1200" alt="Thread-connected WOS audio capture selection showing approximately 1 second active capture">
+  <figcaption><em>Representative Thread-connected WOS audio capture selection showing an approximately 1 s active capture window.</em></figcaption>
+</figure>
+</p>
+
+<figure>
+  <img src="assets/power/embr_thread_dsp_inference_coap_1.png" width="1200" alt="Thread-connected DSP/inference and CoAP command transmission selection">
+  <figcaption><em>Representative Thread-connected DSP/inference + CoAP command transmission selection.</em></figcaption>
+</figure>
+</p>
+
+<figure>
+  <img src="assets/power/embr_thread_command_1.png" width="1200" alt="Full Thread-connected WOS-to-CoAP command selection">
+  <figcaption><em>Representative full Thread-connected WOS-to-CoAP command selection spanning capture through command transmission.</em></figcaption>
+</figure>
+</p>
+
 ### ~~~ DSP/Inference after DMIC Wake-on-Sound (WOS) — Idle + Wake/Inference Event ~~~
 **Behavior**
 - Wake-on-sound (WOS) armed; device remains in low-power idle until a wake event occurs
