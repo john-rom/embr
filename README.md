@@ -58,7 +58,7 @@ additional integration work and the full end-to-end system path will land here a
 - `.github/workflows/` → CI workflows
 - `app/` → application logic and features
 - `boards/` → board-specific overlays and build configuration
-- `docs/` → documentation and README assets (images, diagrams)
+- `docs/` → documentation, architecture decisions, and README assets (images, diagrams)
 - `platform/` → platform abstractions (drivers, wrappers, portability seams)
 - `scripts/` → helper scripts (docs, tooling)
 - `src/` → application entry points / glue code
@@ -67,6 +67,8 @@ additional integration work and the full end-to-end system path will land here a
 - `CMakeLists.txt` → CMake build configuration
 - `Doxyfile` → Doxygen documentation configuration
 - `prj.conf` → Kconfig application configuration
+
+Architecture decisions are recorded in [docs/adr](docs/adr/README.md).
 
 ## Building/Flashing
 ### Requirements
