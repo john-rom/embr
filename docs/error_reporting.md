@@ -43,7 +43,8 @@ avoids duplicated switch logic in the app.
 
 ## Runtime Details
 
-- The deferred transport uses one global work item via `kernel_wrap_error_work_*`.
+- Deferred error handling uses one global work item via
+  `kernel_wrap_error_work_*`.
 - `embr_error_report()` attempts lazy initialization on the reporting path; the
   wrapper makes repeated initialization calls idempotent once the global work
   item is set up.

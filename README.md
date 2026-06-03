@@ -35,7 +35,7 @@ connect with an entire set of drop-in AI modules to support autonomous, intellig
   ### Next
   - Thread/SED idle and event power profiling
   - NFC-assisted or otherwise streamlined Thread commissioning/provisioning
-  - App-level integration testing of the Zephyr runtime shell (`embr_app`)
+  - App-level integration testing of the `embr_app` runtime
 
   ### Planned
   - Track resource metrics, telemetry, and performance benchmarking

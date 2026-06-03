@@ -30,3 +30,12 @@ In repo terms, this means:
 
 If your model uses different labels or windowing parameters, update the app
 code to match before using it.
+
+## Command Selection Behavior
+
+`embr` selects the highest-scoring label after each inference window. `unknown`
+is the default outcome, and ties for the best score resolve to `UNKNOWN`.
+
+`embr_glow`, `embr_sleep`, and `embr_flip` are actionable commands and are
+forwarded to the transport layer. `unknown` and `noise` are valid no-op
+outcomes; they do not produce transport messages.
