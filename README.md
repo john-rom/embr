@@ -178,7 +178,10 @@ west twister -T tests/unit
 </figure>
 </p>
 <p></p>
-Baseline power measurements were captured on a Nordic Thingy:53 using the Nordic Power Profiler Kit II (PPK2), which powered the device under test.
+Power measurements were captured on a Nordic Thingy:53 using the Nordic Power
+Profiler Kit II (PPK2), which powered the device under test. The latest profile
+includes Thread-connected WOS capture, DSP/inference, and multicast CoAP command
+transmission.
 <p></p>
 
 | Profile | Avg Current | Peak Current | Notes |
@@ -189,10 +192,15 @@ Baseline power measurements were captured on a Nordic Thingy:53 using the Nordic
 | WOS Wake Event | 673.25 µA | 14.83 mA | Mean of 6 wake selections; ~1.006 s active capture window per wake |
 | WOS + DSP/Inference Armed Idle | 96.24 µA | 12.83 mA | Mean of 3 idle trials; 26.85 s windows, no wake events |
 | WOS + DSP/Inference Event | 1.154 mA | 16.34 mA | Mean of 3 combined event selections; ~1.175 s capture + DSP/inference window |
+| Thread Network Unavailable (Attach Retry) | 3.97 mA | 25.50 mA | Mean of 3 trials; repeated attach attempts, not idle floor |
+| Thread-Connected Idle + WOS/DSP Armed | 113.98 µA | 10.22 mA | Mean of 3 trials; SED connected idle with WOS + DSP/inference armed |
+| Thread-Connected WOS Capture | 713.67 µA | 14.68 mA | Mean of 3 command events; ~1.003 s capture selection |
+| DSP/Inference + CoAP TX | 3.34 mA | 13.34 mA | Mean of 3 command events; ~217.8 ms DSP/inference + CoAP selection |
+| Full WOS-to-CoAP Command Event | 1.187 mA | 14.68 mA | Mean of 3 command events; ~1.218 s capture-through-CoAP selection |
 
 <figure>
-  <img src="docs/assets/power/embr_wos_inference_ev1_inference.png" width="1200" alt="DSP/Inference event (selected region) showing ~176 ms active DSP/inference window">
-  <figcaption><em>DSP/Inference event (selected region) showing ~176 ms active DSP/inference window.</em></figcaption>
+  <img src="docs/assets/power/embr_thread_command_1.png" width="1200" alt="Full Thread-connected WOS-to-CoAP command event">
+  <figcaption><em>Full Thread-connected WOS-to-CoAP command event spanning capture through command transmission.</em></figcaption>
 </figure>
 <p></p>
 
